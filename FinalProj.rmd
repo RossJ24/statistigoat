@@ -15,7 +15,8 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ```{r}
 #NBA Season's dataset
-szns <- read.csv()
+szn_stats <- read.csv("./Seasons_Stats.csv")
+player_data <- read.csv("./player_data.csv")
 ```
 
 
