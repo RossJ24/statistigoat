@@ -18,5 +18,9 @@ When you click the **Knit** button a document will be generated that includes bo
 szn_stats <- read.csv("./Seasons_Stats.csv")
 player_data <- read.csv("./player_data.csv")
 ```
+```{r}
+# TODO: Add chunk to extract eras here
+```
+
 
 
