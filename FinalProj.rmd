@@ -17,10 +17,19 @@ When you click the **Knit** button a document will be generated that includes bo
 # Load dataset
 szn_stats <- read.csv("./Seasons_Stats.csv")
 player_data <- read.csv("./player_data.csv")
+szn_stats$PPG <- szn_stats$PTS/szn_stats$G
+szn_stats$ORPG <- szn_stats$ORB/szn_stats$G
+szn_stats$DRPG <- szn_stats$DRB/szn_stats$G
+szn_stats$APG <- szn_stats$AST/szn_stats$G
+szn_stats$BPG <- szn_stats$BLK/szn_stats$G
+szn_stats$TPG <- szn_stats$TOV/szn_stats$G
 szn_nums <- szn_stats
-szn_nums$Tm <- NULL
-szn_nums$Player <- NULL
-szn_nums$Pos <- NULL
+szn_stats$Tm <- NULL
+szn_stats$Player <- NULL
+szn_stats$Pos <- NULL
+
+
+
 ```
 
 
@@ -29,53 +38,45 @@ szn_nums$Pos <- NULL
 
 era1 <- szn_nums[which(szn_nums$Year <= 1965),]
 era1 <- era1[!is.na(era1$PER), ]
-era1 <- colMeans(era1)
+era1avg <- colMeans(era1)
 
 era2 <- szn_nums[which(szn_nums$Year > 1965 & szn_nums$Year <= 1980),]
-era2 <- colMeans(era2)
+era2avg <- colMeans(era2)
 
 era3 <- szn_nums[which(szn_nums$Year > 1980 & szn_nums$Year <= 1990),]
-era3 <- colMeans(era3)
+era3avg <- colMeans(era3)
 
 era4 <- szn_nums[which(szn_nums$Year > 1990 & szn_nums$Year <= 2000),]
-era4 <- colMeans(era4)
+era4avg <- colMeans(era4)
 
 era5 <- szn_nums[which(szn_nums$Year > 2000 & szn_nums$Year <= 2010),]
-era5 <- colMeans(era5)
+era5avg <- colMeans(era5)
 
 era6 <- szn_nums[which(szn_nums$Year > 2010),]
-era6 <- colMeans(era6)
-```
-
-```{r}
-#separated the szn_stats into six subsetted datasets based on era.
-#created per game stats for offensive and defensive rebounds, points, assists, blocks, and turnovers
-#missing 67 observations since those rows have NA's in Year
-szn_stats2 <- szn_stats
-szn_stats2$PPG <- szn_stats2$PTS/szn_stats2$G
-szn_stats2$ORPG <- szn_stats2$ORB/szn_stats2$G
-szn_stats2$DRPG <- szn_stats2$DRB/szn_stats2$G
-szn_stats2$APG <- szn_stats2$AST/szn_stats2$G
-szn_stats2$BPG <- szn_stats2$BLK/szn_stats2$G
-szn_stats2$TPG <- szn_stats2$TOV/szn_stats2$G
-szn_stats3 <- szn_stats2
-firstera <- subset(szn_stats2, Year <= 1965, select = c(Year, Player, PER, TS., PPG, ORPG, DRPG, APG, BPG, TPG, G, PTS, ORB, DRB, AST, BLK, TOV))
-
-secondera <- subset(szn_stats2, Year > 1965 & Year <= 1980, select = c(Year, Player, PER, TS., PPG, ORPG, DRPG, APG, BPG, TPG, G, PTS, ORB, DRB, AST, BLK, TOV))
-
-thirdera <- subset(szn_stats2, Year > 1980 & Year <= 1990, select = c(Year, Player, PER, TS., PPG, ORPG, DRPG, APG, BPG, TPG, G, PTS, ORB, DRB, AST, BLK, TOV))
-
-fourthera <- subset(szn_stats2, Year > 1990 & Year <= 2000, select = c(Year, Player, PER, TS., PPG, ORPG, DRPG, APG, BPG, TPG, G, PTS, ORB, DRB, AST, BLK, TOV))
-
-fifthera <- subset(szn_stats2, Year > 2000 & Year <= 2010, select = c(Year, Player, PER, TS., PPG, ORPG, DRPG, APG, BPG, TPG, G, PTS, ORB, DRB, AST, BLK, TOV))
-
-sixthera <- subset(szn_stats2, Year > 2010, select = c(Year, Player, PER, TS., PPG, ORPG, DRPG, APG, BPG, TPG, G, PTS, ORB, DRB, AST, BLK, TOV))
-
-
+era6avg <- colMeans(era6)
+era6
 ```
 
 ```{r}
 
+# Make boxplots of the variables we are considering to show why we need to adjust
+
+#Points Boxplot
+boxplot(c(1:6), era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG, main ="ppg")
+boxplot(c(1:6), era1$APG, era2$APG, era3$APG, era4$APG, era5$APG, era6$APG)
+boxplot(c(1:6), era1$TPG, era2$TPG, era3$TPG, era4$TPG, era5$TPG, era6$TPG)
+boxplot(c(1:6), era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG)
+boxplot(c(1:6), era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG)
 ```
 
+```{r}
+
+
+library(dplyr)
+szn_nums %>% 
+  group_by(Player) %>% 
+  summarise(averagePPG = mean(PPG, na.rm = T), averageAPG = mean(APG, na.rm = T), averageORPG = mean(ORPG, na.rm = T), averageDRPG = mean(DRPG, na.rm = T), averageBPG = mean(BPG, na.rm = T), averageTPG = mean(TPG, na.rm = T))
+
+
+```
 
