@@ -17,16 +17,16 @@ When you click the **Knit** button a document will be generated that includes bo
 # Load dataset
 szn_stats <- read.csv("./Seasons_Stats.csv")
 player_data <- read.csv("./player_data.csv")
-szn_stats$PPG <- szn_stats$PTS/szn_nums$G
-szn_stats$ORPG <- szn_stats$ORB/szn_nums$G
-szn_stats$DRPG <- szn_stats$DRB/szn_nums$G
-szn_stats$APG <- szn_stats$AST/szn_nums$G
-szn_stats$BPG <- szn_stats$BLK/szn_nums$G
-szn_stats$TPG <- szn_stats$TOV/szn_nums$G
+szn_stats$PPG <- szn_stats$PTS/szn_stats$G
+szn_stats$ORPG <- szn_stats$ORB/szn_stats$G
+szn_stats$DRPG <- szn_stats$DRB/szn_stats$G
+szn_stats$APG <- szn_stats$AST/szn_stats$G
+szn_stats$BPG <- szn_stats$BLK/szn_stats$G
+szn_stats$TPG <- szn_stats$TOV/szn_stats$G
 szn_nums <- szn_stats
-szn_nums$Tm <- NULL
-szn_nums$Player <- NULL
-szn_nums$Pos <- NULL
+szn_stats$Tm <- NULL
+szn_stats$Player <- NULL
+szn_stats$Pos <- NULL
 
 ```
 
@@ -56,6 +56,7 @@ era6
 ```
 
 ```{r}
+
 # Make boxplots of the variables we are considering to show why we need to adjust
 
 #Points Boxplot
@@ -74,6 +75,29 @@ boxplot(era1$DRPG, era2$DRPG, era3$DRPG, era4$DRPG, era5$DRPG, era6$DRPG, main =
 ```
 
 ```{r}
+library(dplyr)
+
+
+get_player_avgs <- function(eradf){
+  ret <- eradf %>% 
+  group_by(Player) %>% 
+  summarise(averagePPG = mean(PPG, na.rm = T), averageAPG = mean(APG, na.rm = T), averageORPG = mean(ORPG, na.rm = T), averageDRPG = mean(DRPG, na.rm = T), averageBPG = mean(BPG, na.rm = T), averageTPG = mean(TPG, na.rm = T))
+  return(ret)
+}
+
+get_era_with_player_name <- function(eradf){
+  rowidx <- eradf$X
+  tmp <- eradf
+  tmp$Player <- szn_stats$Player[rowidx]
+  return(tmp)
+}
+
+era1pavgs <- get_player_avgs(era1)
+era2pavgs <- get_player_avgs(era2)
+era3pavgs <- get_player_avgs(era3)
+era4pavgs <- get_player_avgs(era4)
+era5pavgs <- get_player_avgs(era5)
+era6pavgs <- get_player_avgs(era6)
 
 ```
 
