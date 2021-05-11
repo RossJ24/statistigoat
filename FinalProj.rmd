@@ -14,13 +14,41 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
-#NBA Season's dataset
+# Load dataset
 szn_stats <- read.csv("./Seasons_Stats.csv")
 player_data <- read.csv("./player_data.csv")
-```
-```{r}
-# TODO: Add chunk to extract eras here
+szn_nums <- szn_stats
+szn_nums$Tm <- NULL
+szn_nums$Player <- NULL
+szn_nums$Pos <- NULL
 ```
 
+
+```{r}
+# Extract era averages here
+
+era1 <- szn_nums[which(szn_nums$Year <= 1965),]
+era1 <- era1[!is.na(era1$PER), ]
+era1 <- colMeans(era1)
+
+era2 <- szn_nums[which(szn_nums$Year > 1965 & szn_nums$Year <= 1980),]
+era2 <- colMeans(era2)
+
+era3 <- szn_nums[which(szn_nums$Year > 1980 & szn_nums$Year <= 1990),]
+era3 <- colMeans(era3)
+
+era4 <- szn_nums[which(szn_nums$Year > 1990 & szn_nums$Year <= 2000),]
+era4 <- colMeans(era4)
+
+era5 <- szn_nums[which(szn_nums$Year > 2000 & szn_nums$Year <= 2010),]
+era5 <- colMeans(era5)
+
+era6 <- szn_nums[which(szn_nums$Year > 2010),]
+era6 <- colMeans(era6)
+```
+
+```{r}
+
+```
 
 
