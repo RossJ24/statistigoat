@@ -21,6 +21,10 @@ szn_nums <- szn_stats
 szn_nums$Tm <- NULL
 szn_nums$Player <- NULL
 szn_nums$Pos <- NULL
+
+szn_nums$PPG <- szn_nums$PTS / szn_nums$G
+szn_nums$APG <- szn_nums$AST / szn_nums$G
+
 ```
 
 
@@ -29,25 +33,32 @@ szn_nums$Pos <- NULL
 
 era1 <- szn_nums[which(szn_nums$Year <= 1965),]
 era1 <- era1[!is.na(era1$PER), ]
-era1 <- colMeans(era1)
+era1avg <- colMeans(era1)
 
 era2 <- szn_nums[which(szn_nums$Year > 1965 & szn_nums$Year <= 1980),]
-era2 <- colMeans(era2)
+era2avg <- colMeans(era2)
 
 era3 <- szn_nums[which(szn_nums$Year > 1980 & szn_nums$Year <= 1990),]
-era3 <- colMeans(era3)
+era3avg <- colMeans(era3)
 
 era4 <- szn_nums[which(szn_nums$Year > 1990 & szn_nums$Year <= 2000),]
-era4 <- colMeans(era4)
+era4avg <- colMeans(era4)
 
 era5 <- szn_nums[which(szn_nums$Year > 2000 & szn_nums$Year <= 2010),]
-era5 <- colMeans(era5)
+era5avg <- colMeans(era5)
 
 era6 <- szn_nums[which(szn_nums$Year > 2010),]
-era6 <- colMeans(era6)
+era6avg <- colMeans(era6)
+era6
 ```
 
 ```{r}
+# Make boxplots of the variables we are considering to show why we need to adjust
+
+#Points Boxplot
+boxplot(c(1:6), era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG)
+
+boxplot(c(1:6), era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG)
 
 ```
 
