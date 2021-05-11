@@ -17,17 +17,16 @@ When you click the **Knit** button a document will be generated that includes bo
 # Load dataset
 szn_stats <- read.csv("./Seasons_Stats.csv")
 player_data <- read.csv("./player_data.csv")
+szn_stats$PPG <- szn_stats$PTS/szn_nums$G
+szn_stats$ORPG <- szn_stats$ORB/szn_nums$G
+szn_stats$DRPG <- szn_stats$DRB/szn_nums$G
+szn_stats$APG <- szn_stats$AST/szn_nums$G
+szn_stats$BPG <- szn_stats$BLK/szn_nums$G
+szn_stats$TPG <- szn_stats$TOV/szn_nums$G
 szn_nums <- szn_stats
 szn_nums$Tm <- NULL
 szn_nums$Player <- NULL
 szn_nums$Pos <- NULL
-
-szn_nums$PPG <- szn_nums$PTS/szn_nums$G
-szn_nums$ORPG <- szn_nums$ORB/szn_nums$G
-szn_nums$DRPG <- szn_nums$DRB/szn_nums$G
-szn_nums$APG <- szn_nums$AST/szn_nums$G
-szn_nums$BPG <- szn_nums$BLK/szn_nums$G
-szn_nums$TPG <- szn_nums$TOV/szn_nums$G
 
 ```
 
@@ -60,11 +59,21 @@ era6
 # Make boxplots of the variables we are considering to show why we need to adjust
 
 #Points Boxplot
-boxplot(c(1:6), era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG, main ="ppg")
-boxplot(c(1:6), era1$APG, era2$APG, era3$APG, era4$APG, era5$APG, era6$APG)
-boxplot(c(1:6), era1$TPG, era2$TPG, era3$TPG, era4$TPG, era5$TPG, era6$TPG)
-boxplot(c(1:6), era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG)
-boxplot(c(1:6), era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG)
+quantile(era1$PPG)
+quantile(era2$PPG)
+quantile(era3$PPG)
+quantile(era4$PPG)
+quantile(era5$PPG)
+quantile(era6$PPG)
+boxplot(era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG, main ="PPG")
+boxplot(era1$APG, era2$APG, era3$APG, era4$APG, era5$APG, era6$APG, main = "APG")
+boxplot(era1$TPG, era2$TPG, era3$TPG, era4$TPG, era5$TPG, era6$TPG, main = "TPG")
+boxplot(era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG, main = "BPG")
+boxplot(era1$ORPG, era2$ORPG, era3$ORPG, era4$ORPG, era5$ORPG, era6$ORPG, main = "ORPG")
+boxplot(era1$DRPG, era2$DRPG, era3$DRPG, era4$DRPG, era5$DRPG, era6$DRPG, main = "DRPG")
 ```
 
+```{r}
+
+```
 
