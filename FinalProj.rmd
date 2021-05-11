@@ -48,6 +48,23 @@ era6 <- colMeans(era6)
 ```
 
 ```{r}
+#separated the szn_stats into six subsetted datasets based on era.
+#created per game stats for offensive and defensive rebounds, points, assists, blocks, and turnovers
+#missing 67 observations since those rows have NA's in Year
+szn_stats2 <- szn_stats
+szn_stats2$PPG <- szn_stats2$PTS/szn_stats2$G
+szn_stats2$ORPG <- szn_stats2$ORB/szn_stats2$G
+szn_stats2$DRPG <- szn_stats2$DRB/szn_stats2$G
+szn_stats2$APG <- szn_stats2$AST/szn_stats2$G
+szn_stats2$BPG <- szn_stats2$BLK/szn_stats2$G
+szn_stats2$TPG <- szn_stats2$TOV/szn_stats2$G
+
+firstera <- subset(szn_stats2, Year <= 1965, )
+secondera <- subset(szn_stats2, Year > 1965 & Year <= 1980)
+thirdera <- subset(szn_stats2, Year > 1980 & Year <= 1990)
+fourthera <- subset(szn_stats2, Year > 1990 & Year <= 2000)
+fifthera <- subset(szn_stats2, Year > 2000 & Year <= 2010)
+sixthera <- subset(szn_stats2, Year > 2010)
 
 ```
 
