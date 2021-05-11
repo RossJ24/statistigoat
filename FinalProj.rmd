@@ -22,8 +22,12 @@ szn_nums$Tm <- NULL
 szn_nums$Player <- NULL
 szn_nums$Pos <- NULL
 
-szn_nums$PPG <- szn_nums$PTS / szn_nums$G
-szn_nums$APG <- szn_nums$AST / szn_nums$G
+szn_nums$PPG <- szn_nums$PTS/szn_nums$G
+szn_nums$ORPG <- szn_nums$ORB/szn_nums$G
+szn_nums$DRPG <- szn_nums$DRB/szn_nums$G
+szn_nums$APG <- szn_nums$AST/szn_nums$G
+szn_nums$BPG <- szn_nums$BLK/szn_nums$G
+szn_nums$TPG <- szn_nums$TOV/szn_nums$G
 
 ```
 
@@ -56,10 +60,11 @@ era6
 # Make boxplots of the variables we are considering to show why we need to adjust
 
 #Points Boxplot
-boxplot(c(1:6), era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG)
-
-boxplot(c(1:6), era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG)
-
+boxplot(c(1:6), era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG, main ="ppg")
+boxplot(c(1:6), era1$APG, era2$APG, era3$APG, era4$APG, era5$APG, era6$APG)
+boxplot(c(1:6), era1$TPG, era2$TPG, era3$TPG, era4$TPG, era5$TPG, era6$TPG)
+boxplot(c(1:6), era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG)
+boxplot(c(1:6), era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG)
 ```
 
 
