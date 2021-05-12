@@ -24,9 +24,9 @@ szn_stats$APG <- szn_stats$AST/szn_stats$G
 szn_stats$BPG <- szn_stats$BLK/szn_stats$G
 szn_stats$TPG <- szn_stats$TOV/szn_stats$G
 szn_nums <- szn_stats
-szn_stats$Tm <- NULL
-szn_stats$Player <- NULL
-szn_stats$Pos <- NULL
+szn_nums$Tm <- NULL
+szn_nums$Player <- NULL
+szn_nums$Pos <- NULL
 
 ```
 
@@ -52,20 +52,12 @@ era5avg <- colMeans(era5)
 
 era6 <- szn_nums[which(szn_nums$Year > 2010),]
 era6avg <- colMeans(era6)
-era6
 ```
 
 ```{r}
 
 # Make boxplots of the variables we are considering to show why we need to adjust
-
 #Points Boxplot
-quantile(era1$PPG)
-quantile(era2$PPG)
-quantile(era3$PPG)
-quantile(era4$PPG)
-quantile(era5$PPG)
-quantile(era6$PPG)
 boxplot(era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG, main ="PPG")
 boxplot(era1$APG, era2$APG, era3$APG, era4$APG, era5$APG, era6$APG, main = "APG")
 boxplot(era1$TPG, era2$TPG, era3$TPG, era4$TPG, era5$TPG, era6$TPG, main = "TPG")
@@ -73,15 +65,19 @@ boxplot(era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG, main = "BPG"
 boxplot(era1$ORPG, era2$ORPG, era3$ORPG, era4$ORPG, era5$ORPG, era6$ORPG, main = "ORPG")
 boxplot(era1$DRPG, era2$DRPG, era3$DRPG, era4$DRPG, era5$DRPG, era6$DRPG, main = "DRPG")
 ```
+*Why we have to cut out the bottom half of our data, there's a lot of statistical bums.*
+```{r}
+
+```
+
 
 ```{r}
 library(dplyr)
 
-
 get_player_avgs <- function(eradf){
   ret <- eradf %>% 
   group_by(Player) %>% 
-  summarise(averagePPG = mean(PPG, na.rm = T), averageAPG = mean(APG, na.rm = T), averageORPG = mean(ORPG, na.rm = T), averageDRPG = mean(DRPG, na.rm = T), averageBPG = mean(BPG, na.rm = T), averageTPG = mean(TPG, na.rm = T))
+  summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T))
   return(ret)
 }
 
@@ -92,12 +88,35 @@ get_era_with_player_name <- function(eradf){
   return(tmp)
 }
 
-era1pavgs <- get_player_avgs(era1)
-era2pavgs <- get_player_avgs(era2)
-era3pavgs <- get_player_avgs(era3)
-era4pavgs <- get_player_avgs(era4)
-era5pavgs <- get_player_avgs(era5)
-era6pavgs <- get_player_avgs(era6)
+era1pavgs <- get_player_avgs(get_era_with_player_name(era1))
+era2pavgs <- get_player_avgs(get_era_with_player_name(era2))
+era3pavgs <- get_player_avgs(get_era_with_player_name(era3))
+era4pavgs <- get_player_avgs(get_era_with_player_name(era4))
+era5pavgs <- get_player_avgs(get_era_with_player_name(era5))
+era6pavgs <- get_player_avgs(get_era_with_player_name(era6))
 
+```
+
+```{r}
+get_rid_of_bums <- function(df){
+  tmp <- df[df$aPPG >= quantile(df$aPPG, prob= 0.95), ]
+  return(tmp)
+}
+
+era1nb <- get_rid_of_bums(era1pavgs)
+era2nb <- get_rid_of_bums(era2pavgs)
+era3nb <- get_rid_of_bums(era3pavgs)
+era4nb <- get_rid_of_bums(era4pavgs)
+era5nb <- get_rid_of_bums(era5pavgs)
+era6nb <- get_rid_of_bums(era6pavgs)
+```
+
+```{r}
+boxplot(era1nb$aPPG, era2nb$aPPG, era3nb$aPPG, era4nb$aPPG, era5nb$aPPG, era6nb$aPPG, main ="PPG")
+boxplot(era1nb$aAPG, era2nb$aAPG, era3nb$aAPG, era4nb$aAPG, era5nb$aAPG, era6nb$aAPG, main = "APG")
+boxplot(era1nb$aTPG, era2nb$aTPG, era3nb$aTPG, era4nb$aTPG, era5nb$aTPG, era6nb$aTPG, main = "TPG")
+boxplot(era1nb$aBPG, era2nb$aBPG, era3nb$aBPG, era4nb$aBPG, era5nb$aBPG, era6nb$aBPG, main = "BPG")
+boxplot(era1nb$aORPG, era2nb$aORPG, era3nb$aORPG, era4nb$aORPG, era5nb$aORPG, era6nb$aORPG, main = "ORPG")
+boxplot(era1nb$aDRPG, era2nb$aDRPG, era3nb$aDRPG, era4nb$aDRPG, era5nb$aDRPG, era6nb$aDRPG, main = "DRPG")
 ```
 
