@@ -71,8 +71,16 @@ library(dplyr)
 get_player_avgs <- function(eradf){
   ret <- eradf %>% 
   group_by(Player) %>% 
+<<<<<<< HEAD
   summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T), aPER = mean(PER, na.rm = T), aGR = mean(GR, na.rm = T))
   summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T), aPER = mean(PER, na.rm = T))
+=======
+
+  summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T), aPER = mean(PER, na.rm = T), aGR = mean(GR, na.rm = T))
+
+  summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T), aPER = mean(PER, na.rm = T))
+
+>>>>>>> 7ebf2d1c73d924d5d9c6e13f9b4418b284d99cac
   return(ret)
 }
 
@@ -116,7 +124,7 @@ szn_stats_gr <- szn_stats
 
 szn_stats_gr[is.na(szn_stats)] = 0 
 #szn_stats
-
+szn_stats$GR <- szn_stats_gr$GR
 szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_stats_gr$ORPG + (1.5 * szn_stats_gr$APG) + (szn_stats_gr$PER - (1.5 *szn_stats_gr$TPG)) + szn_stats_gr$BPG + (10.0 * szn_stats_gr$TS.)
 szn_stats_gr$GR
 test23 <- get_player_avgs(szn_stats_gr)
@@ -125,5 +133,6 @@ plot(test23$aGR, test23$aPPG)
 max(test69$aGR)
 test69[which(test69$aGR == max(test69$aGR)),]
 test69
+
 ```
 
