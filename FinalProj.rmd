@@ -68,3 +68,43 @@ boxplot(c(1:6), era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG)
 ```
 
 
+```{r}
+#sd for player compared to era
+
+
+era_1 <- szn_stats[szn_stats$Year <= 1965, ]
+era_1 <- era_1[!is.na(era_1$PER), ]
+era_1
+
+era_1_russell <- era_1[era_1$Player == "Bill Russell*",]
+era_1_notrussell <- era_1[era_1$Player != "Bill Russell*",]
+
+era_2 <- szn_stats[szn_stats$Year > 1965 & szn_stats$Year <= 1980 ,]
+
+era_2_wilt <-  era_2[era_2$Player == "Wilt Chamberlain*",]
+era_2_notwilt <- era_2[era_2$Player != "Wilt Chamberlain*",]
+
+era_2_kareem <-  era_2[era_2$Player == "Kareem Abdul-Jabbar*",]
+era_2_notkareem <- era_2[era_2$Player != "Kareem Abdul-Jabbar*",]
+
+
+
+era_3 <- szn_stats[szn_stats$Year > 1980 & szn_stats$Year <= 1990 ,]
+
+era_3_magic <- era_3[era_3$Player == "Magic Johnson*",]
+era_3_notmagic <- era_3[era_3$Player != "Magic Johnson*",]
+
+
+era_3_bird <- era_3[era_3$Player == "Larry Bird*",]
+era_3_notbird <- era_3[era_3$Player != "Larry Bird*",]
+
+
+era_4 <- szn_stats[szn_stats$Year > 1980 & szn_stats$Year <= 1990 ,]
+
+
+
+
+
+
+```
+
