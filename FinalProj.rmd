@@ -82,7 +82,7 @@ era3pavgs <- get_player_avgs(era3)
 era4pavgs <- get_player_avgs(era4)
 era5pavgs <- get_player_avgs(era5)
 era6pavgs <- get_player_avgs(era6)
-
+szn_statspavgs <- get_player_avgs(szn_stats)
 ```
 
 ```{r}
