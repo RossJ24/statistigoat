@@ -17,17 +17,16 @@ When you click the **Knit** button a document will be generated that includes bo
 # Load dataset
 szn_stats <- read.csv("./Seasons_Stats.csv")
 player_data <- read.csv("./player_data.csv")
+szn_stats$PPG <- szn_stats$PTS/szn_stats$G
+szn_stats$ORPG <- szn_stats$ORB/szn_stats$G
+szn_stats$DRPG <- szn_stats$DRB/szn_stats$G
+szn_stats$APG <- szn_stats$AST/szn_stats$G
+szn_stats$BPG <- szn_stats$BLK/szn_stats$G
+szn_stats$TPG <- szn_stats$TOV/szn_stats$G
 szn_nums <- szn_stats
 szn_nums$Tm <- NULL
-szn_nums$Player <- NULL
+szn_nums$Player<- NULL
 szn_nums$Pos <- NULL
-
-szn_nums$PPG <- szn_nums$PTS/szn_nums$G
-szn_nums$ORPG <- szn_nums$ORB/szn_nums$G
-szn_nums$DRPG <- szn_nums$DRB/szn_nums$G
-szn_nums$APG <- szn_nums$AST/szn_nums$G
-szn_nums$BPG <- szn_nums$BLK/szn_nums$G
-szn_nums$TPG <- szn_nums$TOV/szn_nums$G
 
 ```
 
@@ -35,40 +34,223 @@ szn_nums$TPG <- szn_nums$TOV/szn_nums$G
 ```{r}
 # Extract era averages here
 
-era1 <- szn_nums[which(szn_nums$Year <= 1965),]
+era1 <- szn_stats[which(szn_stats$Year <= 1965),]
 era1 <- era1[!is.na(era1$PER), ]
-era1avg <- colMeans(era1)
 
-era2 <- szn_nums[which(szn_nums$Year > 1965 & szn_nums$Year <= 1980),]
-era2avg <- colMeans(era2)
+era2 <- szn_stats[which(szn_stats$Year > 1965 & szn_stats$Year <= 1980),]
 
-era3 <- szn_nums[which(szn_nums$Year > 1980 & szn_nums$Year <= 1990),]
-era3avg <- colMeans(era3)
+era3 <- szn_stats[which(szn_stats$Year > 1980 & szn_stats$Year <= 1990),]
 
-era4 <- szn_nums[which(szn_nums$Year > 1990 & szn_nums$Year <= 2000),]
-era4avg <- colMeans(era4)
+era4 <- szn_stats[which(szn_stats$Year > 1990 & szn_stats$Year <= 2000),]
 
-era5 <- szn_nums[which(szn_nums$Year > 2000 & szn_nums$Year <= 2010),]
-era5avg <- colMeans(era5)
+era5 <- szn_stats[which(szn_stats$Year > 2000 & szn_stats$Year <= 2010),]
 
-era6 <- szn_nums[which(szn_nums$Year > 2010),]
-era6avg <- colMeans(era6)
-era6
+era6 <- szn_stats[which(szn_stats$Year > 2010),]
 ```
 
 ```{r}
+
 # Make boxplots of the variables we are considering to show why we need to adjust
-
 #Points Boxplot
-boxplot(c(1:6), era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG, main ="ppg")
-boxplot(c(1:6), era1$APG, era2$APG, era3$APG, era4$APG, era5$APG, era6$APG)
-boxplot(c(1:6), era1$TPG, era2$TPG, era3$TPG, era4$TPG, era5$TPG, era6$TPG)
-boxplot(c(1:6), era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG)
-boxplot(c(1:6), era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG)
+#boxplot(era1$PPG, era2$PPG, era3$PPG, era4$PPG, era5$PPG, era6$PPG, main ="PPG")
+#boxplot(era1$APG, era2$APG, era3$APG, era4$APG, era5$APG, era6$APG, main = "APG")
+#boxplot(era1$TPG, era2$TPG, era3$TPG, era4$TPG, era5$TPG, era6$TPG, main = "TPG")
+#boxplot(era1$BPG, era2$BPG, era3$BPG, era4$BPG, era5$BPG, era6$BPG, main = "BPG")
+#boxplot(era1$ORPG, era2$ORPG, era3$ORPG, era4$ORPG, era5$ORPG, era6$ORPG, main = "ORPG")
+#boxplot(era1$DRPG, era2$DRPG, era3$DRPG, era4$DRPG, era5$DRPG, era6$DRPG, main = "DRPG")
+```
+*Why we have to cut out the bottom half of our data, there's a lot of statistical bums.*
+```{r}
+
 ```
 
 
 ```{r}
+library(dplyr)
+
+get_player_avgs <- function(eradf){
+  ret <- eradf %>% 
+  group_by(Player) %>% 
+
+  summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T), aPER = mean(PER, na.rm = T), aGR = mean(GR, na.rm = T))
+  return(ret)
+}
+
+
+era1pavgs <- get_player_avgs(era1)
+era2pavgs <- get_player_avgs(era2)
+era3pavgs <- get_player_avgs(era3)
+era4pavgs <- get_player_avgs(era4)
+era5pavgs <- get_player_avgs(era5)
+era6pavgs <- get_player_avgs(era6)
+szn_statspavgs <- get_player_avgs(szn_stats)
+szn_statspavgs <- szn_statspavgs[-1, ]
+```
+
+```{r}
+#got rid of all players that do not have a PPG above or at the 95th percentile since it is reasonable to expect a potential GOAT to score at a high level
+get_rid_of_bums <- function(df){
+  tmp <- df[df$aPPG >= quantile(df$aPPG, prob= 0.95), ]
+  return(tmp)
+}
+
+era1nb <- get_rid_of_bums(era1pavgs)
+era2nb <- get_rid_of_bums(era2pavgs)
+era3nb <- get_rid_of_bums(era3pavgs)
+era4nb <- get_rid_of_bums(era4pavgs)
+era5nb <- get_rid_of_bums(era5pavgs)
+era6nb <- get_rid_of_bums(era6pavgs)
+szn_statsnb <- get_rid_of_bums(szn_statspavgs)
+szn_statsnb[which(szn_statsnb$aGR == max(szn_statsnb$aGR)), ]
+```
+
+```{r}
+boxplot(era1nb$aPPG, era2nb$aPPG, era3nb$aPPG, era4nb$aPPG, era5nb$aPPG, era6nb$aPPG, main ="PPG")
+boxplot(era1nb$aAPG, era2nb$aAPG, era3nb$aAPG, era4nb$aAPG, era5nb$aAPG, era6nb$aAPG, main = "APG")
+boxplot(era1nb$aTPG, era2nb$aTPG, era3nb$aTPG, era4nb$aTPG, era5nb$aTPG, era6nb$aTPG, main = "TPG")
+boxplot(era1nb$aBPG, era2nb$aBPG, era3nb$aBPG, era4nb$aBPG, era5nb$aBPG, era6nb$aBPG, main = "BPG")
+boxplot(era1nb$aORPG, era2nb$aORPG, era3nb$aORPG, era4nb$aORPG, era5nb$aORPG, era6nb$aORPG, main = "ORPG")
+boxplot(era1nb$aDRPG, era2nb$aDRPG, era3nb$aDRPG, era4nb$aDRPG, era5nb$aDRPG, era6nb$aDRPG, main = "DRPG")
+boxplot(era1nb$aTSP, era2nb$aTSP, era3nb$aTSP, era4nb$aTSP, era5nb$aTSP, era6nb$aTSP, main = "TSP")
+boxplot(era1nb$aPER, era2nb$aPER, era3nb$aPER, era4nb$aPER, era5nb$aPER, era6nb$aPER, main = "PER")
+```
+```{r}
+szn_stats_gr <- szn_stats
+
+szn_stats_gr[is.na(szn_stats)] = 0 
+
+szn_stats$GR <- szn_stats_gr$GR
+szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_stats_gr$ORPG + (1.5 * szn_stats_gr$APG) + (szn_stats_gr$PER - (1.5 *szn_stats_gr$TPG)) + szn_stats_gr$BPG + (10.0 * szn_stats_gr$TS.)
+
+#test23 <- get_player_avgs(szn_stats_gr)
+#test69 <- get_rid_of_bums(test23)
+#plot(test23$aGR, test23$aPPG)
+#max(test69$aGR)
+#test69[which(test69$aGR == max(test69$aGR)),]
+#test69[which(test69$aPPG == max(test69$aPPG)),]
+#szn_stats[which(szn_stats$GR == max(szn_stats$GR)), ]
+```
+
+
+```{r}
+#bootstrapping the correlations between each variable and GOAT Rating(GR)
+
+N <- nrow(szn_statsnb)
+
+n_samp <- 10000
+
+corResultsPPG <- rep(NA, n_samp)
+corResultsAPG <- rep(NA, n_samp)
+corResultsDRPG <- rep(NA, n_samp)
+corResultsORPG <- rep(NA, n_samp)
+corResultsTSP <- rep(NA, n_samp)
+corResultsTPG <- rep(NA, n_samp)
+corResultsPER <- rep(NA, n_samp)
+corResultsBPG <- rep(NA, n_samp)
+
+for(i in 1:n_samp){
+  
+  s <- sample(1:N, N , replace = T)
+  fakeData <-  szn_statsnb[s, ]
+    
+  corResultsPPG[i] <- cor(fakeData[, 10], fakeData[, 2], use = "pairwise.complete.obs")
+  corResultsAPG[i] <- cor(fakeData[, 10], fakeData[, 3], use = "pairwise.complete.obs")
+  corResultsDRPG[i] <- cor(fakeData[, 10], fakeData[, 5], use = "pairwise.complete.obs")
+  corResultsORPG[i] <- cor(fakeData[, 10], fakeData[, 4], use = "pairwise.complete.obs")
+  corResultsTSP[i] <- cor(fakeData[, 10], fakeData[, 8], use = "pairwise.complete.obs")
+  corResultsTPG[i] <- cor(fakeData[, 10], fakeData[, 7], use = "pairwise.complete.obs")
+  corResultsPER[i] <- cor(fakeData[, 10], fakeData[, 9], use = "pairwise.complete.obs")
+  corResultsBPG[i] <- cor(fakeData[, 10], fakeData[, 6], use = "pairwise.complete.obs")
+
+}
+
+
+#performing the correlations between each variable and GOAT rating(GR) in szn_statspavgs
+print("Correlation between PPG and GR")
+cor(szn_statsnb$aPPG, szn_statsnb$aGR, use = "pairwise.complete.obs")
+print("Correlation between APG and GR")
+cor(szn_statsnb$aAPG, szn_statsnb$aGR, use = "pairwise.complete.obs")
+print("Correlation between DRPG and GR")
+cor(szn_statsnb$aDRPG, szn_statsnb$aGR, use = "pairwise.complete.obs")
+print("Correlation between ORPG and GR")
+cor(szn_statsnb$aORPG, szn_statsnb$aGR, use = "pairwise.complete.obs")
+print("Correlation between TSP and GR")
+cor(szn_statsnb$aTSP, szn_statsnb$aGR, use = "pairwise.complete.obs")
+print("Correlation between TPG and GR")
+cor(szn_statsnb$aTPG, szn_statsnb$aGR, use = "pairwise.complete.obs")
+print("Correlation between PER and GR")
+cor(szn_statsnb$aPER, szn_statsnb$aGR, use = "pairwise.complete.obs")
+print("Correlation between BPG and GR")
+cor(szn_statsnb$aBPG, szn_statsnb$aGR, use = "pairwise.complete.obs")
+
+#histograms of bootstrapped correlations with confidence intervals
+ci_rPPG <- quantile(corResultsPPG, c(.025, .975))
+hist(corResultsPPG, col = "blue", main = "Bootstrapped PPG Correlations", xlab = "Sample Correlation", breaks = 50)
+
+abline(v = ci_rPPG, lwd = 3, col = "red")
+abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aPPG)$conf.int, lwd = 3, col = "green", lty = 2)
+legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
+
+
+ci_rAPG <- quantile(corResultsAPG, c(.025, .975))
+hist(corResultsAPG, col = "blue", main = "Bootstrapped APG Correlations", xlab = "Sample Correlation", breaks = 50)
+
+abline(v = ci_rAPG, lwd = 3, col = "red")
+abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aAPG)$conf.int, lwd = 3, col = "green", lty = 2)
+legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
+
+
+ci_rDRPG <- quantile(corResultsDRPG, c(.025, .975))
+hist(corResultsDRPG, col = "blue", main = "Bootstrapped DRPG Correlations", xlab = "Sample Correlation", breaks = 50)
+
+abline(v = ci_rDRPG, lwd = 3, col = "red")
+abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aDRPG)$conf.int, lwd = 3, col = "green", lty = 2)
+legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
+
+
+ci_rORPG <- quantile(corResultsORPG, c(.025, .975))
+hist(corResultsORPG, col = "blue", main = "Bootstrapped ORPG Correlations", xlab = "Sample Correlation", breaks = 50)
+
+abline(v = ci_rORPG, lwd = 3, col = "red")
+abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aORPG)$conf.int, lwd = 3, col = "green", lty = 2)
+legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
+
+
+ci_rTSP <- quantile(corResultsTSP, c(.025, .975))
+hist(corResultsTSP, col = "blue", main = "Bootstrapped TSP Correlations", xlab = "Sample Correlation", breaks = 50)
+
+abline(v = ci_rTSP, lwd = 3, col = "red")
+abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aTSP)$conf.int, lwd = 3, col = "green", lty = 2)
+legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
+
+
+ci_rTPG <- quantile(corResultsTPG, c(.025, .975))
+hist(corResultsTPG, col = "blue", main = "Bootstrapped TPG Correlations", xlab = "Sample Correlation", breaks = 50)
+
+abline(v = ci_rTPG, lwd = 3, col = "red")
+abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aTPG)$conf.int, lwd = 3, col = "green", lty = 2)
+legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
+
+
+ci_rPER <- quantile(corResultsPER, c(.025, .975))
+hist(corResultsPER, col = "blue", main = "Bootstrapped PER Correlations", xlab = "Sample Correlation", breaks = 50)
+
+abline(v = ci_rPER, lwd = 3, col = "red")
+abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aPER)$conf.int, lwd = 3, col = "green", lty = 2)
+legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
+
+
+ci_rBPG <- quantile(corResultsBPG, c(.025, .975))
+hist(corResultsBPG, col = "blue", main = "Bootstrapped BPG Correlations", xlab = "Sample Correlation", breaks = 50)
+
+abline(v = ci_rBPG, lwd = 3, col = "red")
+abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aBPG)$conf.int, lwd = 3, col = "green", lty = 2)
+legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
+```
+
+
+```{r}
+<<<<<<< HEAD
 #sd for player compared to era
 
 
@@ -104,6 +286,34 @@ era_4 <- szn_stats[szn_stats$Year > 1980 & szn_stats$Year <= 1990 ,]
 
 
 
+=======
+#scatterplots plotting each variable versus GR
+
+myCor <- function(x, y, w, z){
+  #make the scatterplot
+  plot(x, y, pch = 19, col = "red", xlab = w, ylab = z)
+  #add text in the margin reporting the sample correlation)
+  mtext(paste("Sample Correlation =", round(cor(x, y, use = "pairwise.complete.obs"), 3)), cex = 1.2)
+}
+
+#myCor(szn_statspavgs$aPPG, szn_statspavgs$aGR, "PPG", "GR")
+#myCor(szn_statspavgs$aAPG, szn_statspavgs$aGR, "APG", "GR")
+#myCor(szn_statspavgs$aDRPG, szn_statspavgs$aGR, "DRPG", "GR")
+#myCor(szn_statspavgs$aORPG, szn_statspavgs$aGR, "ORPG", "GR")
+#myCor(szn_statspavgs$aTSP, szn_statspavgs$aGR, "TSP", "GR")
+#myCor(szn_statspavgs$aTPG, szn_statspavgs$aGR, "TPG", "GR")
+#myCor(szn_statspavgs$aPER, szn_statspavgs$aGR, "PER", "GR")
+#myCor(szn_statspavgs$aBPG, szn_statspavgs$aGR, "BPG", "GR")
+
+myCor(szn_statsnb$aPPG, szn_statsnb$aGR, "PPG", "GR")
+myCor(szn_statsnb$aAPG, szn_statsnb$aGR, "APG", "GR")
+myCor(szn_statsnb$aDRPG, szn_statsnb$aGR, "DRPG", "GR")
+myCor(szn_statsnb$aORPG, szn_statsnb$aGR, "ORPG", "GR")
+myCor(szn_statsnb$aTSP, szn_statsnb$aGR, "TSP", "GR")
+myCor(szn_statsnb$aTPG, szn_statsnb$aGR, "TPG", "GR")
+myCor(szn_statsnb$aPER, szn_statsnb$aGR, "PER", "GR")
+myCor(szn_statsnb$aBPG, szn_statsnb$aGR, "BPG", "GR")
+>>>>>>> 4728b93c9cad4ce0d72855be7e47f7a6c36ec4f3
 
 
 ```
