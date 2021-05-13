@@ -23,6 +23,11 @@ szn_stats$DRPG <- szn_stats$DRB/szn_stats$G
 szn_stats$APG <- szn_stats$AST/szn_stats$G
 szn_stats$BPG <- szn_stats$BLK/szn_stats$G
 szn_stats$TPG <- szn_stats$TOV/szn_stats$G
+szn_stats_gr <- szn_stats
+szn_stats_gr[is.na(szn_stats)] <- 0 
+szn_stats$GR <- szn_stats_gr$GR
+szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_stats_gr$ORPG + (1.5 * szn_stats_gr$APG) + (szn_stats_gr$PER - (1.5 *szn_stats_gr$TPG)) + szn_stats_gr$BPG + (10.0 * szn_stats_gr$TS.)
+szn_stats <- szn_stats_gr
 szn_nums <- szn_stats
 szn_nums$Tm <- NULL
 szn_nums$Player<- NULL
@@ -116,12 +121,14 @@ boxplot(era1nb$aTSP, era2nb$aTSP, era3nb$aTSP, era4nb$aTSP, era5nb$aTSP, era6nb$
 boxplot(era1nb$aPER, era2nb$aPER, era3nb$aPER, era4nb$aPER, era5nb$aPER, era6nb$aPER, main = "PER")
 ```
 ```{r}
-szn_stats_gr <- szn_stats
 
+<<<<<<< HEAD
 szn_stats_gr[is.na(szn_stats)] = 0 
 
 szn_stats$GR <- szn_stats_gr$GR
 szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_stats_gr$ORPG + (1.5 * szn_stats_gr$APG) - (1.5 *szn_stats_gr$TPG) + szn_stats_gr$BPG + (10.0 * szn_stats_gr$TS.)
+=======
+>>>>>>> 547c2d47f49f70def9ea2ed4380f8d34a3eba5bc
 
 #test23 <- get_player_avgs(szn_stats_gr)
 #test69 <- get_rid_of_bums(test23)
@@ -217,6 +224,41 @@ legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red")
 
 
 ```{r}
+
+#sd for player compared to era
+
+
+era_1 <- szn_statsnb[szn_statsnb$Year <= 1965, ]
+era_1 <- era_1[!is.na(era_1$PER), ]
+era_1
+
+era_1_russell <- era_1[era_1$Player == "Bill Russell*",]
+era_1_notrussell <- era_1[era_1$Player != "Bill Russell*",]
+
+era_2 <- szn_stats[szn_stats$Year > 1965 & szn_stats$Year <= 1980 ,]
+
+era_2_wilt <-  era_2[era_2$Player == "Wilt Chamberlain*",]
+era_2_notwilt <- era_2[era_2$Player != "Wilt Chamberlain*",]
+
+era_2_kareem <-  era_2[era_2$Player == "Kareem Abdul-Jabbar*",]
+era_2_notkareem <- era_2[era_2$Player != "Kareem Abdul-Jabbar*",]
+
+era_3 <- szn_stats[szn_stats$Year > 1980 & szn_stats$Year <= 1990 ,]
+
+era_3_magic <- era_3[era_3$Player == "Magic Johnson*",]
+era_3_notmagic <- era_3[era_3$Player != "Magic Johnson*",]
+
+
+era_3_bird <- era_3[era_3$Player == "Larry Bird*",]
+era_3_notbird <- era_3[era_3$Player != "Larry Bird*",]
+
+
+era_4 <- szn_stats[szn_stats$Year > 1980 & szn_stats$Year <= 1990 ,]
+
+
+
+
+
 #scatterplots plotting each variable versus GR
 
 myCor <- function(x, y, w, z){
@@ -282,8 +324,12 @@ which.min(mod1sum$bic)
 #Which variables are in model 2
 names(szn_statsnb2)[mod1sum$which[which.min(mod1sum$bic), ]][-1]
 
+<<<<<<< HEAD
 #Fit this model and show results
 temp <- szn_statsnb2[,mod1sum$which[which.min(mod1sum$bic), ]]
 summary(lm(aGR ~ ., data = temp))
+=======
+
+>>>>>>> 547c2d47f49f70def9ea2ed4380f8d34a3eba5bc
 ```
 
