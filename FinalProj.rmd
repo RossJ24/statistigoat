@@ -51,7 +51,20 @@ era4 <- szn_stats[which(szn_stats$Year > 1990 & szn_stats$Year <= 2000),]
 era5 <- szn_stats[which(szn_stats$Year > 2000 & szn_stats$Year <= 2010),]
 
 era6 <- szn_stats[which(szn_stats$Year > 2010),]
+
+alleras <- rbind(era1, era2, era3, era4, era5, era6)
 ```
+
+```{r}
+#making a new dataset for anova by era
+alleras <- alleras[, c(2, 3, 60)]
+alleras %>% 
+  group_by(Player) %>% 
+  summarise(aGR = mean(GR, na.rm = TRUE))
+
+
+```
+
 
 ```{r}
 
@@ -122,13 +135,13 @@ boxplot(era1nb$aPER, era2nb$aPER, era3nb$aPER, era4nb$aPER, era5nb$aPER, era6nb$
 ```
 ```{r}
 
-<<<<<<< HEAD
+
 szn_stats_gr[is.na(szn_stats)] = 0 
 
 szn_stats$GR <- szn_stats_gr$GR
 szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_stats_gr$ORPG + (1.5 * szn_stats_gr$APG) - (1.5 *szn_stats_gr$TPG) + szn_stats_gr$BPG + (10.0 * szn_stats_gr$TS.)
-=======
->>>>>>> 547c2d47f49f70def9ea2ed4380f8d34a3eba5bc
+
+
 
 #test23 <- get_player_avgs(szn_stats_gr)
 #test69 <- get_rid_of_bums(test23)
@@ -324,12 +337,12 @@ which.min(mod1sum$bic)
 #Which variables are in model 2
 names(szn_statsnb2)[mod1sum$which[which.min(mod1sum$bic), ]][-1]
 
-<<<<<<< HEAD
+
 #Fit this model and show results
 temp <- szn_statsnb2[,mod1sum$which[which.min(mod1sum$bic), ]]
 summary(lm(aGR ~ ., data = temp))
-=======
 
->>>>>>> 547c2d47f49f70def9ea2ed4380f8d34a3eba5bc
+
+
 ```
 
