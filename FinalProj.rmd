@@ -157,6 +157,7 @@ boxplot(era1nb$aPER, era2nb$aPER, era3nb$aPER, era4nb$aPER, era5nb$aPER, era6nb$
 ```
 ```{r}
 
+<<<<<<< HEAD
 
 szn_stats_gr[is.na(szn_stats)] = 0 
 
@@ -165,11 +166,13 @@ szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_sta
 
 
 
+=======
+>>>>>>> 154b5b2dd9e4dd0dc9f6c87170e6620807255dd1
 #test23 <- get_player_avgs(szn_stats_gr)
 #test69 <- get_rid_of_bums(test23)
 #plot(test23$aGR, test23$aPPG)
 #max(test69$aGR)
-test69[which(test69$aGR == max(test69$aGR)),]
+#test69[which(test69$aGR == max(test69$aGR)),]
 #test69[which(test69$aPPG == max(test69$aPPG)),]
 #szn_stats[which(szn_stats$GR == max(szn_stats$GR)), ]
 ```
@@ -360,11 +363,55 @@ which.min(mod1sum$bic)
 names(szn_statsnb2)[mod1sum$which[which.min(mod1sum$bic), ]][-1]
 
 
+
 #Fit this model and show results
 temp <- szn_statsnb2[,mod1sum$which[which.min(mod1sum$bic), ]]
 summary(lm(aGR ~ ., data = temp))
 
 
+
+
+#Fit this model and show results
+temp <- szn_statsnb2[,mod1sum$which[which.min(mod1sum$bic), ]]
+summary(lm(aGR ~ ., data = temp))
+```
+
+```{r}
+#Permuatation tests
+set.seed(230)
+avgdiff <- vector(10000, mode = "numeric")
+
+actualdiff <- mean(szn_stats$PER[szn_stats$Year <= 1980]) - mean(szn_stats$PER[szn_stats$Year > 1980 ])
+
+for(i in 1:10000){
+  fakeyear <- sample(szn_stats$Year)
+  avgdiff[i] <- mean(szn_stats$PER[fakeyear <= 1980]) - mean(szn_stats$PER[fakeyear > 1980 ])
+  
+}
+
+#Add something to make the abline show
+hist(avgdiff, col= "blue")
+abline(v= actualdiff, col = "green", lwd = 3)
+actualdiff
+```
+
+```{r}
+#Permutation tests
+set.seed(230)
+avgdiff <- vector(10000, mode = "numeric")
+
+actualdiff <- mean(szn_stats$TS.[szn_stats$Year <= 1980] *100) - mean(szn_stats$TS.[szn_stats$Year > 1980 ]*100)
+
+for(i in 1:10000){
+  fakeyear <- sample(szn_stats$Year)
+  avgdiff[i] <- mean(szn_stats$TS.[fakeyear <= 1980]*100) - mean(szn_stats$TS.[fakeyear > 1980 ]*100)
+  
+}
+
+#Add something to make the abline show
+hist(avgdiff, col= "blue")
+abline(v= actualdiff, col = "green", lwd = 3)
+actualdiff
 
 ```
 
