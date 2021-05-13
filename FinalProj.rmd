@@ -77,7 +77,7 @@ library(dplyr)
 get_player_avgs <- function(eradf){
   ret <- eradf %>% 
   group_by(Player) %>% 
-  summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T))
+  summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T))
   return(ret)
 }
 
@@ -118,5 +118,6 @@ boxplot(era1nb$aTPG, era2nb$aTPG, era3nb$aTPG, era4nb$aTPG, era5nb$aTPG, era6nb$
 boxplot(era1nb$aBPG, era2nb$aBPG, era3nb$aBPG, era4nb$aBPG, era5nb$aBPG, era6nb$aBPG, main = "BPG")
 boxplot(era1nb$aORPG, era2nb$aORPG, era3nb$aORPG, era4nb$aORPG, era5nb$aORPG, era6nb$aORPG, main = "ORPG")
 boxplot(era1nb$aDRPG, era2nb$aDRPG, era3nb$aDRPG, era4nb$aDRPG, era5nb$aDRPG, era6nb$aDRPG, main = "DRPG")
+boxplot(era1nb$aTSP, era2nb$aTSP, era3nb$aTSP, era4nb$aTSP, era5nb$aTSP, era6nb$aTSP, main = "TSP")
 ```
 
