@@ -251,36 +251,125 @@ legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red")
 
 ```{r}
 
-#sd for player compared to era
+#player compared to era
 
 
-era_1 <- szn_statsnb[szn_statsnb$Year <= 1965, ]
+szn_stats
+
+
+era_1 <- szn_stats[szn_stats$Year <= 1965, ]
 era_1 <- era_1[!is.na(era_1$PER), ]
-era_1
 
 era_1_russell <- era_1[era_1$Player == "Bill Russell*",]
 era_1_notrussell <- era_1[era_1$Player != "Bill Russell*",]
+
+era_1_russell_gr <- mean(era_1_russell$GR)
+
+era_1_notrussell_gr <- mean(era_1_notrussell$GR)
+
+
+russel_compared_to_rest <- era_1_russell_gr/era_1_notrussell_gr
+
 
 era_2 <- szn_stats[szn_stats$Year > 1965 & szn_stats$Year <= 1980 ,]
 
 era_2_wilt <-  era_2[era_2$Player == "Wilt Chamberlain*",]
 era_2_notwilt <- era_2[era_2$Player != "Wilt Chamberlain*",]
 
+era_2_wilt_gr <- mean(era_2_wilt$GR)
+
+era_2_notwilt_gr <- mean(era_2_notwilt$GR)
+
+wilt_compared_to_rest <- era_2_wilt_gr/era_2_notwilt_gr
+
+
+
+
 era_2_kareem <-  era_2[era_2$Player == "Kareem Abdul-Jabbar*",]
 era_2_notkareem <- era_2[era_2$Player != "Kareem Abdul-Jabbar*",]
+
+era_2_kareem_gr <- mean(era_2_kareem$GR)
+
+era_2_notkareem_gr <- mean(era_2_notkareem$GR)
+
+kareem_compared_to_rest <- era_2_kareem_gr/era_2_notkareem_gr
+
 
 era_3 <- szn_stats[szn_stats$Year > 1980 & szn_stats$Year <= 1990 ,]
 
 era_3_magic <- era_3[era_3$Player == "Magic Johnson*",]
 era_3_notmagic <- era_3[era_3$Player != "Magic Johnson*",]
 
+era_3_magic_gr <- mean(era_3_magic$GR)
+
+era_3_notmagic_gr <- mean(era_3_notmagic$GR)
+
+magic_compared_to_rest <- era_3_magic_gr/era_3_notmagic_gr
+
 
 era_3_bird <- era_3[era_3$Player == "Larry Bird*",]
 era_3_notbird <- era_3[era_3$Player != "Larry Bird*",]
 
+era_3_bird_gr <- mean(era_3_bird$GR)
 
-era_4 <- szn_stats[szn_stats$Year > 1980 & szn_stats$Year <= 1990 ,]
+era_3_notbird_gr <- mean(era_3_notbird$GR)
 
+bird_compared_to_rest <- era_3_bird_gr/era_3_notbird_gr
+
+
+era_4 <- szn_stats[szn_stats$Year > 1990 & szn_stats$Year <= 2000 ,]
+
+era_4_mj <-  era_4[era_4$Player == "Michael Jordan*",]
+era_4_notmj <- era_4[era_4$Player != "Michael Jordan*",]
+
+era_4_mj_gr <- mean(era_4_mj$GR)
+
+era_4_notmj_gr <- mean(era_4_notmj$GR)
+
+mj_compared_to_rest <- era_4_mj_gr/era_4_notmj_gr
+
+
+era_4_shaq <-  era_4[era_4$Player == "Shaquille O'Neal*",]
+era_4_notshaq <- era_4[era_4$Player != "Shaquille O'Neal*",]
+
+era_4_shaq_gr <- mean(era_4_shaq$GR)
+
+era_4_notshaq_gr <- mean(era_4_notshaq$GR)
+
+shaq_compared_to_rest <- era_4_shaq_gr/era_4_notshaq_gr
+
+
+era_5 <- szn_stats[szn_stats$Year > 2000 & szn_stats$Year <= 2010 ,]
+
+era_5_td <-  era_5[era_5$Player == "Tim Duncan",]
+era_5_nottd <- era_5[era_5$Player != "Tim Duncan",]
+
+era_5_td_gr <- mean(era_5_td$GR)
+
+era_5_nottd_gr <- mean(era_5_nottd$GR)
+
+td_compared_to_rest <- era_5_td_gr/era_5_nottd_gr
+
+era_5_kobe <-  era_5[era_5$Player == "Kobe Bryant",]
+era_5_notkobe <- era_5[era_5$Player != "Kobe Bryant",]
+
+era_5_kobe_gr <- mean(era_5_kobe$GR)
+
+era_5_notkobe_gr <- mean(era_5_notkobe$GR)
+
+kobe_compared_to_rest <- era_5_kobe_gr/era_5_notkobe_gr
+
+
+era_6 <- szn_stats[szn_stats$Year > 2010,]
+
+era_6_lbj <-  era_5[era_5$Player == "LeBron James",]
+era_6_notlbj <- era_5[era_5$Player != "LeBron James",]
+
+era_6_lbj_gr <- mean(era_6_lbj$GR)
+
+era_6_notlbj_gr <- mean(era_6_notlbj$GR)
+
+lbj_compared_to_rest <- era_6_lbj_gr/era_6_notlbj_gr
 
 
 
@@ -313,6 +402,37 @@ myCor(szn_statsnb$aPER, szn_statsnb$aGR, "PER", "GR")
 myCor(szn_statsnb$aBPG, szn_statsnb$aGR, "BPG", "GR")
 
 
+
+```
+
+```{r}
+#standard deviation
+
+
+russel_sd <- (era_1_russell_gr - sd(era1$GR))/mean(era1$GR) 
+wilt_sd <- (era_2_wilt_gr - sd(era2$GR))/mean(era2$GR) 
+
+kareem_sd <- (era_2_kareem_gr - sd(era2$GR))/mean(era2$GR) 
+
+magic_sd <- (era_3_magic_gr - sd(era3$GR))/mean(era3$GR)
+
+bird_sd <- (era_3_bird_gr - sd(era3$GR))/mean(era3$GR)
+
+mj_sd <- (era_4_mj_gr - sd(era4$GR))/mean(era4$GR)
+
+shaq_sd <- (era_4_shaq_gr - sd(era4$GR))/mean(era4$GR)
+
+td_sd <- (era_5_td_gr - sd(era5$GR))/mean(era5$GR)
+
+kobe_sd <- (era_5_kobe_gr - sd(era5$GR))/mean(era5$GR)
+
+lbj_sd <- (era_6_lbj_gr - sd(era6$GR))/mean(era6$GR)
+```
+
+```{r}
+
+
+ 
 
 ```
 
