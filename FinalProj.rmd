@@ -53,16 +53,38 @@ era5 <- szn_stats[which(szn_stats$Year > 2000 & szn_stats$Year <= 2010),]
 era6 <- szn_stats[which(szn_stats$Year > 2010),]
 
 alleras <- rbind(era1, era2, era3, era4, era5, era6)
+
+
 ```
 
 ```{r}
 #making a new dataset for anova by era
-alleras <- alleras[, c(2, 3, 60)]
-alleras %>% 
+firstera <- era1
+firstera$Era <- 1
+
+secondera <- era2
+secondera$Era <- 2
+
+thirdera <- era3
+thirdera$Era <- 3
+
+fourthera <- era4
+fourthera$Era <- 4
+
+fifthera <- era5
+fifthera$Era <- 5
+
+sixthera <- era6
+sixthera$Era <- 6
+
+alleras <- rbind(firstera, secondera, thirdera, fourthera, fifthera, sixthera)
+
+alleras <- alleras[, c(3, 60, 61)]
+alleras <- alleras %>% 
   group_by(Player) %>% 
-  summarise(aGR = mean(GR, na.rm = TRUE))
+  summarise(aGR = mean(GR, na.rm = TRUE), era = round(mean(Era, na.rm = TRUE), digits = 0))
 
-
+alleras
 ```
 
 
