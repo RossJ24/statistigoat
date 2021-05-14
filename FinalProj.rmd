@@ -78,6 +78,8 @@ fifthera$Era <- 5
 sixthera <- era6
 sixthera$Era <- 6
 
+library(dplyr)
+
 alleras <- rbind(firstera, secondera, thirdera, fourthera, fifthera, sixthera)
 
 alleras <- alleras[, c(3, 60, 61, 54)]
@@ -194,11 +196,6 @@ szn_stats$GR <- szn_stats_gr$GR
 szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_stats_gr$ORPG + (1.5 * szn_stats_gr$APG) - (1.5 *szn_stats_gr$TPG) + szn_stats_gr$BPG + (10.0 * szn_stats_gr$TS.)
 
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> d825dc36ff6045ff805fe83247f8ed4de9bbdb48
 #test23 <- get_player_avgs(szn_stats_gr)
 #test69 <- get_rid_of_bums(test23)
 #plot(test23$aGR, test23$aPPG)
@@ -598,11 +595,19 @@ lbj_sd <- (era_6_lbj_gr - mean(era6$GR))/sd(era6$GR)
 ```{r}
 alleras_nb <- get_rid_of_bums(alleras)
 
+alleras_nb$era <- factor(alleras_nb$era, labels = c("1", "2", "3", "4", "5", "6"))
+
 aov1 <- aov(aGR ~ era, data = alleras_nb)
 
 summary(aov1)
 
- 
+TukeyHSD(aov1)
+
+# Gives SIMULTANEOUS 95% CI's for the 10 differences in means.
+plot(TukeyHSD(aov1))
+
+#Fix axes
+plot(TukeyHSD(aov1), las = 1)
 
 ```
 
