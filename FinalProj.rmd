@@ -178,7 +178,7 @@ szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_sta
 
 szn_statsnb$aVORP[szn_statsnb$aVORP == 0] <- NA
 szn_statsnb$aUSG[szn_statsnb$aUSG == 0] <- NA
-
+set.seed(230)
 N <- nrow(szn_statsnb)
 
 n_samp <- 10000
@@ -203,17 +203,6 @@ for(i in 1:n_samp){
 }
 
 
-#performing the correlations between each variable and GOAT rating(GR) in szn_statspavgs
-print("Correlation between PER and GR")
-cor(szn_statsnb$aPER, szn_statsnb$aGR, use = "pairwise.complete.obs")
-print("Correlation between VORP and GR")
-cor(szn_statsnb$aVORP, szn_statsnb$aGR, use = "pairwise.complete.obs")
-print("Correlation between OWS and GR")
-cor(szn_statsnb$aOWS, szn_statsnb$aGR, use = "pairwise.complete.obs")
-print("Correlation between DWS and GR")
-cor(szn_statsnb$aDWS, szn_statsnb$aGR, use = "pairwise.complete.obs")
-print("Correlation between USG and GR")
-cor(szn_statsnb$aUSG, szn_statsnb$aGR, use = "pairwise.complete.obs")
 
 #histograms of bootstrapped correlations with confidence intervals
 ci_rPER <- quantile(corResultsPER, c(.025, .975))
@@ -308,7 +297,7 @@ szn_statsnb2 <- szn_statsnb2[, c(9, 8, 10, 11, 12, 13)]
 source("http://www.reuningscherer.net/s&ds230/Rfuncs/regJDRS.txt")
 
 pairsJDRS(szn_statsnb2)
-#some evidence of multicolinearity between the variables present. VORP is correlated to DWS, OWS, and PER. PER is correlated to all other variables. Perhaps we should delete VORP and PER?
+#some evidence of multicollinearity between the variables present. VORP is correlated to DWS, OWS, and PER. PER is correlated to all other variables. Perhaps we should delete VORP and PER?
 ```
 
 
@@ -317,8 +306,7 @@ pairsJDRS(szn_statsnb2)
 
 lm1 <- lm(aGR ~ aPER + aVORP + aOWS + aDWS + aUSG, data=szn_statsnb2)
 summary(lm1)
-
-myResPlots2(lm1)
+myResPlots2(lm1, label = "Model with All Predictors")
 ```
 
 ```{r}
@@ -333,11 +321,12 @@ mod1sum <- summary(mod1)
 #find what number of variables give the best model according to BIC
 which.min(mod1sum$bic)
 
-#Which variables are in model 4
+#Which variables are in model 2
 names(szn_statsnb2)[mod1sum$which[which.min(mod1sum$bic), ]][-1]
 
 #Fit this model and show results
 temp <- szn_statsnb2[,mod1sum$which[which.min(mod1sum$bic), ]]
+myResPlots2(lm(log(temp$aGR) ~ ., data = temp))
 summary(lm(aGR ~ ., data = temp))
 ```
 
@@ -366,12 +355,17 @@ myResPlots2(lm2)
 mod2 <- regsubsets(aGR ~ ., data = szn_statsnb3, nvmax = 3)
 
 mod2sum <- summary(mod2)
-
+summary(mod2)
 which.min(mod2sum$bic)
 
 #since all variables are in this, it is the same as the original model
 names(szn_statsnb3)[mod2sum$which[which.min(mod2sum$bic), ]][-1]
 
+```
+```{r}
+#final model 
+finalmod <- summary(lm(aGR ~ ., data = temp))
+finalmod
 ```
 
 
@@ -592,15 +586,11 @@ summary(aov1)
 
 TukeyHSD(aov1)
 
-# Gives SIMULTANEOUS 95% CI's for the 10 differences in means.
-plot(TukeyHSD(aov1))
-
-#Fix axes
 plot(TukeyHSD(aov1), las = 1)
 
 mod3 <- lm(aGR ~ era, data = alleras_nb)
 
-myResPlots(mod3, label = "Player GOAT Rating by Era")
+myResPlots2(mod3, label = "Player GOAT Rating by Era")
 ```
 
 
