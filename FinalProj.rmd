@@ -70,10 +70,6 @@ era6 <- szn_stats[which(szn_stats$Year > 2010),]
 
 *We split up the eras using larger periods (15 years) in the first two eras when the league was smaller, and decreased it to 10 for all eras up until 2010 when we used the remaining years of the dataset until 2017 to form our final era.*
 
-```{r}
-
-```
-
 
 ```{r}
 get_player_avgs <- function(eradf){
@@ -239,18 +235,6 @@ legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red")
 ```
 
 **
-
-```{r}
-
-
-
-
-
-
-
-
-
-```
 
 
 ```{r}
@@ -576,10 +560,23 @@ alleras <- alleras[-1, ]
 
 alleras_nb <- get_rid_of_bums_avg(alleras)
 
+alleras_nb$era <- factor(alleras_nb$era, labels = c("1", "2", "3", "4", "5", "6"))
+
 aov1 <- aov(aGR ~ era, data = alleras_nb)
 
 summary(aov1)
 
+TukeyHSD(aov1)
+
+# Gives SIMULTANEOUS 95% CI's for the 10 differences in means.
+plot(TukeyHSD(aov1))
+
+#Fix axes
+plot(TukeyHSD(aov1), las = 1)
+
+mod3 <- lm(aGR ~ era, data = alleras_nb)
+
+myResPlots(mod3, label = "Player GOAT Rating by Era")
 ```
 ```{r}
 kobe_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Kobe Bryant"),]
