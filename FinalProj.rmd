@@ -145,19 +145,21 @@ szn_statsnb[which(szn_statsnb$aGR == max(szn_statsnb$aGR)), ]
 ```
 
 ```{r}
-#to put to rest: should era factor into who the GOAT is? does it impact it? pair with ANOVA to answer this 
-boxplot(era1nb$aPPG, era2nb$aPPG, era3nb$aPPG, era4nb$aPPG, era5nb$aPPG, era6nb$aPPG, main ="PPG")
-boxplot(era1nb$aAPG, era2nb$aAPG, era3nb$aAPG, era4nb$aAPG, era5nb$aAPG, era6nb$aAPG, main = "APG")
-boxplot(era1nb$aTPG, era2nb$aTPG, era3nb$aTPG, era4nb$aTPG, era5nb$aTPG, era6nb$aTPG, main = "TPG")
-boxplot(era1nb$aBPG, era2nb$aBPG, era3nb$aBPG, era4nb$aBPG, era5nb$aBPG, era6nb$aBPG, main = "BPG")
-boxplot(era1nb$aORPG, era2nb$aORPG, era3nb$aORPG, era4nb$aORPG, era5nb$aORPG, era6nb$aORPG, main = "ORPG")
-boxplot(era1nb$aDRPG, era2nb$aDRPG, era3nb$aDRPG, era4nb$aDRPG, era5nb$aDRPG, era6nb$aDRPG, main = "DRPG")
-boxplot(era1nb$aTSP, era2nb$aTSP, era3nb$aTSP, era4nb$aTSP, era5nb$aTSP, era6nb$aTSP, main = "TSP")
-boxplot(era1nb$aPER, era2nb$aPER, era3nb$aPER, era4nb$aPER, era5nb$aPER, era6nb$aPER, main = "PER")
+#to put to rest: do different eras have different levels of competition? pair with ANOVA to answer this 
+boxplot(era1nb$aGR, era2nb$aGR, era3nb$aGR, era4nb$aGR, era5nb$aGR, era6nb$aGR, main ="GOAT Rating by Era", names = c("1950-1965", "1966-1980", "1981-1990", "1991-2000", "2001-2010", "2011-2017"), las = 2)
+
+#boxplot(era1nb$aPPG, era2nb$aPPG, era3nb$aPPG, era4nb$aPPG, era5nb$aPPG, era6nb$aPPG, main ="PPG")
+#boxplot(era1nb$aAPG, era2nb$aAPG, era3nb$aAPG, era4nb$aAPG, era5nb$aAPG, era6nb$aAPG, main = "APG")
+#boxplot(era1nb$aTPG, era2nb$aTPG, era3nb$aTPG, era4nb$aTPG, era5nb$aTPG, era6nb$aTPG, main = "TPG")
+#boxplot(era1nb$aBPG, era2nb$aBPG, era3nb$aBPG, era4nb$aBPG, era5nb$aBPG, era6nb$aBPG, main = "BPG")
+#boxplot(era1nb$aORPG, era2nb$aORPG, era3nb$aORPG, era4nb$aORPG, era5nb$aORPG, era6nb$aORPG, main = "ORPG")
+#boxplot(era1nb$aDRPG, era2nb$aDRPG, era3nb$aDRPG, era4nb$aDRPG, era5nb$aDRPG, era6nb$aDRPG, main = "DRPG")
+#boxplot(era1nb$aTSP, era2nb$aTSP, era3nb$aTSP, era4nb$aTSP, era5nb$aTSP, era6nb$aTSP, main = "TSP")
+#boxplot(era1nb$aPER, era2nb$aPER, era3nb$aPER, era4nb$aPER, era5nb$aPER, era6nb$aPER, main = "PER")
 ```
 ```{r}
 
-<<<<<<< HEAD
+
 
 szn_stats_gr[is.na(szn_stats)] = 0 
 
@@ -166,8 +168,7 @@ szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_sta
 
 
 
-=======
->>>>>>> 154b5b2dd9e4dd0dc9f6c87170e6620807255dd1
+
 #test23 <- get_player_avgs(szn_stats_gr)
 #test69 <- get_rid_of_bums(test23)
 #plot(test23$aGR, test23$aPPG)
