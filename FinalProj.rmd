@@ -114,13 +114,7 @@ library(dplyr)
 get_player_avgs <- function(eradf){
   ret <- eradf %>% 
   group_by(Player) %>% 
-
-<<<<<<< HEAD
-  summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T), aPER = mean(PER, na.rm = T), aGR = mean(GR, na.rm = T))
-
-=======
   summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T), aPER = mean(PER, na.rm = T), aGR = mean(GR, na.rm = T), aUSG = mean(USG., na.rm = T), aOWS = mean(OWS, na.rm = T), aDWS = mean(DWS, na.rm = T), aVORP = mean(VORP, na.rm = T))
->>>>>>> d9051c81ab152beac835535210c4873ee1c042c2
   return(ret)
 }
 
@@ -193,8 +187,6 @@ test1$p.value
 
 ```{r}
 
-
-
 szn_stats_gr[is.na(szn_stats)] = 0 
 
 szn_stats$GR <- szn_stats_gr$GR
@@ -213,6 +205,9 @@ szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_sta
 
 ```{r}
 #bootstrapping the correlations between each advanced stat variable and GOAT Rating(GR)
+
+szn_statsnb$aVORP[szn_statsnb$aVORP == 0] <- NA
+szn_statsnb$aUSG[szn_statsnb$aUSG == 0] <- NA
 
 N <- nrow(szn_statsnb)
 
@@ -618,6 +613,8 @@ mod3 <- lm(aGR ~ era, data = alleras_nb)
 
 myResPlots(mod3, label = "Player GOAT Rating by Era")
 ```
+
+
 ```{r}
 kobe_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Kobe Bryant"),]
 kobe_peak <- kobe_peak[which.max(kobe_peak$GR),]
@@ -714,32 +711,6 @@ hakeem_peak <- hakeem_peak[which.max(hakeem_peak$GR),]
 #hakeem_peak
 hakeem_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1993" & szn_stats_gr$Tm == "HOU"  & szn_stats_gr$Player != "Hakeem Olajuwon*"),]
 #hakeem_teammates
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```
 
 
