@@ -63,9 +63,6 @@ era5 <- szn_stats[which(szn_stats$Year > 2000 & szn_stats$Year <= 2010),]
 
 era6 <- szn_stats[which(szn_stats$Year > 2010),]
 
-
-
-
 ```
 
 *We split up the eras using larger periods (15 years) in the first two eras when the league was smaller, and decreased it to 10 for all eras up until 2010 when we used the remaining years of the dataset until 2017 to form our final era.*
@@ -130,55 +127,82 @@ boxplot(era1nb$aGR, era2nb$aGR, era3nb$aGR, era4nb$aGR, era5nb$aGR, era6nb$aGR, 
 *After getting rid of bums, it is easier to see the actual difference in Goat Rating between the top players of each era.*
 
 ```{r}
-#use t test to see whether the Lakers or the Celtics have had better players over the years by GR to see which is the better franchise since they have won the same number of championships
+# New dataset for ANOVA by era
+firstera <- era1
+firstera$Era <- 1
 
-szn_statsBOS <- szn_stats[which(szn_stats$Tm == "BOS"),]
+secondera <- era2
+secondera$Era <- 2
 
-szn_statsLAL <- szn_stats[which(szn_stats$Tm == "LAL"),]
+thirdera <- era3
+thirdera$Era <- 3
 
-szn_statsBOS <- get_player_avgs(szn_statsBOS)
+fourthera <- era4
+fourthera$Era <- 4
 
-szn_statsLAL <- get_player_avgs(szn_statsLAL)
+fifthera <- era5
+fifthera$Era <- 5
 
-szn_statsBOS$Team <- "BOS"
-szn_statsLAL$Team <- "LAL"
+sixthera <- era6
+sixthera$Era <- 6
 
-szn_statsBOSLAL <- rbind(szn_statsBOS, szn_statsLAL)
+# Bind the era dataframes together
+alleras <- rbind(firstera, secondera, thirdera, fourthera, fifthera, sixthera)
 
-test1 <- t.test(aGR ~ Team, data = szn_statsBOSLAL)
-tapply(szn_statsBOSLAL$aGR, szn_statsBOSLAL$Team, mean)
-test1$conf.int 
-test1$p.value
+alleras <- alleras[, c(3, 60, 61, 54)]
+alleras <- alleras %>% 
+  group_by(Player) %>% 
+  summarise(aGR = mean(GR, na.rm = TRUE), era = round(mean(Era, na.rm = TRUE), digits = 0), aPPG = mean(PPG,na.rm =  T))
 
-#fail to reject the null that the difference in mean GRs of BOS and LAL is zero with a alpha of 0.05. conclusion: there is no significant difference therefore the teams are the same level of greatness.
+alleras <- alleras[-1, ]
+
+alleras_nb <- get_rid_of_bums_avg(alleras)
+
+alleras_nb$era <- factor(alleras_nb$era, labels = c("1", "2", "3", "4", "5", "6"))
+
+aov1 <- aov(aGR ~ era, data = alleras_nb)
+
+summary(aov1)
+
+TukeyHSD(aov1)
+
+# Gives SIMULTANEOUS 95% CI's for the 10 differences in means.
+plot(TukeyHSD(aov1))
+
+#Fix axes
+plot(TukeyHSD(aov1), las = 1)
+
+mod3 <- lm(aGR ~ era, data = alleras_nb)
+
+myResPlots(mod3, label = "Player GOAT Rating by Era")
 ```
+**
 
 
 ```{r}
-
-szn_stats_gr[is.na(szn_stats)] = 0 
-
-szn_stats$GR <- szn_stats_gr$GR
-szn_stats_gr$GR <- (2.0 *szn_stats_gr$PPG) + ((4/5)*szn_stats_gr$DRPG) + szn_stats_gr$ORPG + (1.5 * szn_stats_gr$APG) - (1.5 *szn_stats_gr$TPG) + szn_stats_gr$BPG + (10.0 * szn_stats_gr$TS.)
-
-
-#test23 <- get_player_avgs(szn_stats_gr)
-#test69 <- get_rid_of_bums(test23)
-#plot(test23$aGR, test23$aPPG)
-#max(test69$aGR)
-#test69[which(test69$aGR == max(test69$aGR)),]
-#test69[which(test69$aPPG == max(test69$aPPG)),]
-#szn_stats[which(szn_stats$GR == max(szn_stats$GR)), ]
-
-```
-*fail to reject the null that the difference in mean GRs of BOS and LAL is zero with a alpha of 0.05. conclusion: there is no significant difference therefore the teams are the same level of greatness.*
-
-```{r}
-#bootstrapping the correlations between each advanced stat variable and GOAT Rating(GR)
+#scatterplots plotting each variable versus GR
 
 szn_statsnb$aVORP[szn_statsnb$aVORP == 0] <- NA
 szn_statsnb$aUSG[szn_statsnb$aUSG == 0] <- NA
 set.seed(230)
+myCor <- function(x, y, w, z){
+  #make the scatterplot
+  plot(x, y, pch = 19, col = "red", xlab = w, ylab = z)
+  #add text in the margin reporting the sample correlation)
+  mtext(paste("Sample Correlation =", round(cor(x, y, use = "pairwise.complete.obs"), 3)), cex = 1.2)
+}
+
+myCor(szn_statsnb$aPER, szn_statsnb$aGR, "PER", "GR")
+myCor(szn_statsnb$aOWS, szn_statsnb$aGR, "OWS", "GR")
+myCor(szn_statsnb$aDWS, szn_statsnb$aGR, "DWS", "GR")
+myCor(szn_statsnb$aVORP, szn_statsnb$aGR, "VORP", "GR")
+myCor(szn_statsnb$aUSG, szn_statsnb$aGR, "USG", "GR")
+```
+
+
+```{r}
+#bootstrapping the correlations between each advanced stat variable and GOAT Rating(GR)
+
 N <- nrow(szn_statsnb)
 
 n_samp <- 10000
@@ -201,8 +225,6 @@ for(i in 1:n_samp){
   corResultsUSG[i] <- cor(fakeData[, 10], fakeData[, 11], use = "pairwise.complete.obs")
 
 }
-
-
 
 #histograms of bootstrapped correlations with confidence intervals
 ci_rPER <- quantile(corResultsPER, c(.025, .975))
@@ -243,49 +265,54 @@ hist(corResultsUSG, col = "blue", main = "Bootstrapped USG Correlations", xlab =
 abline(v = ci_rUSG, lwd = 3, col = "red")
 abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aUSG)$conf.int, lwd = 3, col = "green", lty = 2)
 legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
-
-
 ```
 
 **
 
 
 ```{r}
-#scatterplots plotting each variable versus GR
+#Permutation tests on TS and PER between season stats before 1980 and season stats after 1980
+set.seed(230)
+avgdiff <- vector(10000, mode = "numeric")
 
-myCor <- function(x, y, w, z){
-  #make the scatterplot
-  plot(x, y, pch = 19, col = "red", xlab = w, ylab = z)
-  #add text in the margin reporting the sample correlation)
-  mtext(paste("Sample Correlation =", round(cor(x, y, use = "pairwise.complete.obs"), 3)), cex = 1.2)
+tmpszn <- szn_stats[!is.na(szn_stats$PER), ]
+actualdiff <- mean(tmpszn$PER[tmpszn$Year <= 1980]) - mean(tmpszn$PER[tmpszn$Year > 1980 ])
+
+for(i in 1:10000){
+  fakeyear <- sample(tmpszn$Year)
+  avgdiff[i] <- mean(tmpszn$PER[fakeyear <= 1980]) - mean(tmpszn$PER[fakeyear > 1980 ])
+  
 }
 
-#myCor(szn_statspavgs$aPPG, szn_statspavgs$aGR, "PPG", "GR")
-#myCor(szn_statspavgs$aAPG, szn_statspavgs$aGR, "APG", "GR")
-#myCor(szn_statspavgs$aDRPG, szn_statspavgs$aGR, "DRPG", "GR")
-#myCor(szn_statspavgs$aORPG, szn_statspavgs$aGR, "ORPG", "GR")
-#myCor(szn_statspavgs$aTSP, szn_statspavgs$aGR, "TSP", "GR")
-#myCor(szn_statspavgs$aTPG, szn_statspavgs$aGR, "TPG", "GR")
-#myCor(szn_statspavgs$aPER, szn_statspavgs$aGR, "PER", "GR")
-#myCor(szn_statspavgs$aBPG, szn_statspavgs$aGR, "BPG", "GR")
-
-myCor(szn_statsnb$aPER, szn_statsnb$aGR, "PER", "GR")
-myCor(szn_statsnb$aOWS, szn_statsnb$aGR, "OWS", "GR")
-myCor(szn_statsnb$aDWS, szn_statsnb$aGR, "DWS", "GR")
-myCor(szn_statsnb$aVORP, szn_statsnb$aGR, "VORP", "GR")
-myCor(szn_statsnb$aUSG, szn_statsnb$aGR, "USG", "GR")
+#Add something to make the abline show
+hist(avgdiff, col= "blue", xlim = c(-.7, .7), main="Permuted Sample Differences")
+abline(v= actualdiff, col = "green", lwd = 3)
+text(actualdiff,0, paste("Actual Difference in means =", round(actualdiff, 3)), srt = 90, adj = 0)
+actualdiff
+mean(abs(avgdiff) >= abs(actualdiff))
 ```
 
 
 ```{r}
-#Potential GOATs ordered in descending GOAT Rating
+#Permutation tests continued
+set.seed(230)
+avgdiff <- vector(10000, mode = "numeric")
+tmpszn <- szn_stats[!is.na(szn_stats$TS.), ]
+actualdiff <- mean(tmpszn$TS.[tmpszn$Year <= 1980] *100) - mean(tmpszn$TS.[tmpszn$Year > 1980 ]*100)
 
-goatorder <- szn_statsnb %>% arrange(desc(aGR))
-goatorder <- goatorder[, c(1, 10)]
-goatorder
+for(i in 1:10000){
+  fakeyear <- sample(tmpszn$Year)
+  avgdiff[i] <- mean(tmpszn$TS.[fakeyear <= 1980]*100) - mean(tmpszn$TS.[fakeyear > 1980 ]*100)
+  
+}
+
+#Add something to make the abline show
+hist(avgdiff, col= "blue", xlim = c(-7, 7), main="Permuted Sample Differences")
+abline(v= actualdiff, col = "green", lwd = 3)
+text(actualdiff,0, paste("Actual Differences in Means =", round(actualdiff, 3)), srt = 90, adj = 0)
+actualdiff
+mean(abs(avgdiff) >= abs(actualdiff))
 ```
-
-
 
 ```{r}
 #multiple regression
@@ -294,7 +321,6 @@ goatorder
 szn_statsnb2 <- szn_statsnb[complete.cases(szn_statsnb), ]
 szn_statsnb2 <- szn_statsnb2[,-1]
 szn_statsnb2 <- szn_statsnb2[, c(9, 8, 10, 11, 12, 13)]
-source("http://www.reuningscherer.net/s&ds230/Rfuncs/regJDRS.txt")
 
 pairsJDRS(szn_statsnb2)
 #some evidence of multicollinearity between the variables present. VORP is correlated to DWS, OWS, and PER. PER is correlated to all other variables. Perhaps we should delete VORP and PER?
@@ -362,51 +388,39 @@ which.min(mod2sum$bic)
 names(szn_statsnb3)[mod2sum$which[which.min(mod2sum$bic), ]][-1]
 
 ```
+
 ```{r}
 #final model 
 finalmod <- summary(lm(aGR ~ ., data = temp))
 finalmod
 ```
 
+**
 
 ```{r}
-#Permutation tests on TS and PER between season stats before 1980 and season stats after 1980
-set.seed(230)
-avgdiff <- vector(10000, mode = "numeric")
+#use t test to see whether the Lakers or the Celtics have had better players over the years by GR to see which is the better franchise since they have won the same number of championships
 
-actualdiff <- mean(szn_stats$PER[szn_stats$Year <= 1980]) - mean(szn_stats$PER[szn_stats$Year > 1980 ])
+szn_statsBOS <- szn_stats[which(szn_stats$Tm == "BOS"),]
 
-for(i in 1:10000){
-  fakeyear <- sample(szn_stats$Year)
-  avgdiff[i] <- mean(szn_stats$PER[fakeyear <= 1980]) - mean(szn_stats$PER[fakeyear > 1980 ])
-  
-}
+szn_statsLAL <- szn_stats[which(szn_stats$Tm == "LAL"),]
 
-#Add something to make the abline show
-hist(avgdiff, col= "blue")
-abline(v= actualdiff, col = "green", lwd = 3)
-actualdiff
+szn_statsBOS <- get_player_avgs(szn_statsBOS)
+
+szn_statsLAL <- get_player_avgs(szn_statsLAL)
+
+szn_statsBOS$Team <- "BOS"
+szn_statsLAL$Team <- "LAL"
+
+szn_statsBOSLAL <- rbind(szn_statsBOS, szn_statsLAL)
+
+test1 <- t.test(aGR ~ Team, data = szn_statsBOSLAL)
+tapply(szn_statsBOSLAL$aGR, szn_statsBOSLAL$Team, mean)
+test1$conf.int 
+test1$p.value
+
+#fail to reject the null that the difference in mean GRs of BOS and LAL is zero with a alpha of 0.05. conclusion: there is no significant difference therefore the teams are the same level of greatness.
 ```
 
-```{r}
-#Permutation tests continued
-set.seed(230)
-avgdiff <- vector(10000, mode = "numeric")
-
-actualdiff <- mean(szn_stats$TS.[szn_stats$Year <= 1980] *100) - mean(szn_stats$TS.[szn_stats$Year > 1980 ]*100)
-
-for(i in 1:10000){
-  fakeyear <- sample(szn_stats$Year)
-  avgdiff[i] <- mean(szn_stats$TS.[fakeyear <= 1980]*100) - mean(szn_stats$TS.[fakeyear > 1980 ]*100)
-  
-}
-
-#Add something to make the abline show
-hist(avgdiff, col= "blue")
-abline(v= actualdiff, col = "green", lwd = 3)
-actualdiff
-
-```
 
 ```{r}
 #standard deviation
@@ -426,7 +440,7 @@ era_1_notrussell_gr <- mean(era_1_notrussell$GR)
 russel_compared_to_rest <- era_1_russell_gr/era_1_notrussell_gr
 
 
-era_2 <- szn_stats[szn_stats$Year > 1965 & szn_stats$Year <= 1980 ,]
+era_2 <- szn_stats[(szn_stats$Year > 1965 & szn_stats$Year <= 1980),]
 
 era_2_wilt <-  era_2[era_2$Player == "Wilt Chamberlain*",]
 era_2_notwilt <- era_2[era_2$Player != "Wilt Chamberlain*",]
@@ -544,152 +558,179 @@ td_sd <- (era_5_td_gr - mean(era5$GR))/sd(era5$GR)
 kobe_sd <- (era_5_kobe_gr - mean(era5$GR))/sd(era5$GR)
 
 lbj_sd <- (era_6_lbj_gr - mean(era6$GR))/sd(era6$GR)
+
+player_enum <- c(1:10)
+playersds <-  c(russel_sd, wilt_sd, kareem_sd, magic_sd, bird_sd, mj_sd, shaq_sd, td_sd, kobe_sd, lbj_sd)
+player_names <- c("russel", "wilt", "kareem", "magic", "bird", "jordan", "shaq", "duncan", "kobe", "lebron")
+plot(playersds~player_enum, pch = 19, col = "red", ylab= "", xlab="# of player")
+text(playersds~player_enum, labels=player_names, cex=0.9, font=2)
 ```
 
-```{r}
-# New dataset for ANOVA by era
-firstera <- era1
-firstera$Era <- 1
 
-secondera <- era2
-secondera$Era <- 2
-
-thirdera <- era3
-thirdera$Era <- 3
-
-fourthera <- era4
-fourthera$Era <- 4
-
-fifthera <- era5
-fifthera$Era <- 5
-
-sixthera <- era6
-sixthera$Era <- 6
-
-# Bind the era dataframes together
-alleras <- rbind(firstera, secondera, thirdera, fourthera, fifthera, sixthera)
-
-alleras <- alleras[, c(3, 60, 61, 54)]
-alleras <- alleras %>% 
-  group_by(Player) %>% 
-  summarise(aGR = mean(GR, na.rm = TRUE), era = round(mean(Era, na.rm = TRUE), digits = 0), aPPG = mean(PPG,na.rm =  T))
-
-alleras <- alleras[-1, ]
-
-alleras_nb <- get_rid_of_bums_avg(alleras)
-
-alleras_nb$era <- factor(alleras_nb$era, labels = c("1", "2", "3", "4", "5", "6"))
-
-aov1 <- aov(aGR ~ era, data = alleras_nb)
-
-summary(aov1)
-
-TukeyHSD(aov1)
-
-plot(TukeyHSD(aov1), las = 1)
-
-mod3 <- lm(aGR ~ era, data = alleras_nb)
-
-myResPlots2(mod3, label = "Player GOAT Rating by Era")
-```
-
+**
 
 ```{r}
 kobe_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Kobe Bryant"),]
 kobe_peak <- kobe_peak[which.max(kobe_peak$GR),]
 #kobe_peak
+
 kobe_teammates <- szn_stats_gr[which(szn_stats_gr$Year == "2006" & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Kobe Bryant"),]
 #kobe_teammates
+kobe_gr <- mean(kobe_peak$GR)
+kobe_team_gr <- mean(kobe_teammates$GR)
+kobe_adjusted_gr <- kobe_gr - kobe_team_gr
 tmac_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Tracy McGrady"),]
 tmac_peak <- tmac_peak[which.max(tmac_peak$GR),]
 #tmac_peak
 tmac_teammates <- szn_stats_gr[which(szn_stats_gr$Year == "2003" & szn_stats_gr$Tm == "ORL"  & szn_stats_gr$Player != "Tracy McGrady"),]
+tmac_gr <- mean(tmac_peak$GR)
+tmac_team_gr <- mean(tmac_teammates$GR)
+tmac_adjusted_gr <- tmac_gr - tmac_team_gr
 #tmac_teammates
 
 
 lebron_peak <- szn_stats_gr[which(szn_stats_gr$Player == "LeBron James"),]
 lebron_peak <- lebron_peak[which.max(lebron_peak$GR),]
 #lebron_peak
-lebron_teammates <- szn_stats_gr[which(szn_stats_gr$Year == "2010" & szn_stats_gr$Tm == "CLE"  & szn_stats_gr$Player != "LeBron James"),]
+lebron_teammates <- szn_stats_gr[which(szn_stats_gr$Year == 2010 & szn_stats_gr$Tm == "CLE"  & szn_stats_gr$Player != "LeBron James"),]
 #lebron_teammates
+lebron_gr <- mean(lebron_peak$GR)
+lebron_team_gr <- mean(lebron_teammates$GR)
+lebron_adjusted_gr <- lebron_gr - lebron_team_gr
+
+
 durant_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Kevin Durant"),]
 durant_peak <- durant_peak[which.max(durant_peak$GR),]
 #durant_peak
-durant_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "2014" & szn_stats_gr$Tm == "OKC"  & szn_stats_gr$Player != "Kevin Durant"),]
+durant_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 2014 & szn_stats_gr$Tm == "OKC"  & szn_stats_gr$Player != "Kevin Durant"),]
 #durant_teammates
+durant_gr <- mean(durant_peak$GR)
+durant_team_gr <- mean(durant_teammates$GR)
+durant_adjusted_gr <- durant_gr - durant_team_gr
+
 
 
 jordan_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Michael Jordan*"),]
 jordan_peak <- jordan_peak[which.max(jordan_peak$GR),]
 #jordan_peak
-jordan_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1988" & szn_stats_gr$Tm == "CHI"  & szn_stats_gr$Player != "Michael Jordan*"),]
+jordan_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 1988 & szn_stats_gr$Tm == "CHI"  & szn_stats_gr$Player != "Michael Jordan*"),]
 #jordan_teammates
+jordan_gr <- mean(jordan_peak$GR)
+jordan_team_gr <- mean(jordan_teammates$GR)
+jordan_adjusted_gr <- jordan_gr - jordan_team_gr
+
 barkley_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Charles Barkley*"),]
 barkley_peak <- barkley_peak[which.max(barkley_peak$GR),]
 #barkley_peak
-barkley_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1988" & szn_stats_gr$Tm == "PHI"  & szn_stats_gr$Player != "Charles Barkley*"),]
+barkley_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 1988 & szn_stats_gr$Tm == "PHI"  & szn_stats_gr$Player != "Charles Barkley*"),]
 #barkley_teammates
+barkley_gr <- mean(barkley_peak$GR)
+barkley_team_gr <- mean(barkley_teammates$GR)
+barkley_adjusted_gr <- barkley_gr - barkley_team_gr
+
 
 
 chamberlain_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Wilt Chamberlain*"),]
 chamberlain_peak <- chamberlain_peak[which.max(chamberlain_peak$GR),]
 #chamberlain_peak
-chamberlain_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1962" & szn_stats_gr$Tm == "PHW"  & szn_stats_gr$Player != "Wilt Chamberlain*"),]
+chamberlain_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 1962 & szn_stats_gr$Tm == "PHW"  & szn_stats_gr$Player != "Wilt Chamberlain*"),]
 #chamberlain_teammates
+chamberlain_gr <- mean(chamberlain_peak$GR)
+chamberlain_team_gr <- mean(chamberlain_teammates$GR)
+chamberlain_adjusted_gr <- chamberlain_gr - chamberlain_team_gr
 russell_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Bill Russell*"),]
 russell_peak <- russell_peak[which.max(russell_peak$GR),]
 #russell_peak
-russell_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1962" & szn_stats_gr$Tm == "BOS"  & szn_stats_gr$Player != "Bill Russell*"),]
+russell_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 1962 & szn_stats_gr$Tm == "BOS"  & szn_stats_gr$Player != "Bill Russell*"),]
 #russell_teammates
-
+russell_gr <- mean(russell_peak$GR)
+russell_team_gr <- mean(russell_teammates$GR)
+russell_adjusted_gr <- russell_gr - russell_team_gr
 
 kareem_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Kareem Abdul-Jabbar*"),]
 kareem_peak <- kareem_peak[which.max(kareem_peak$GR),]
 #kareem_peak
-kareem_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1976" & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Kareem Abdul-Jabbar*"),]
+kareem_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 1976 & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Kareem Abdul-Jabbar*"),]
 #kareem_teammates
+kareem_team_gr <- mean(kareem_teammates$GR)
+kareem_gr <- mean(kareem_peak$GR)
+kareem_adjusted_gr <- kareem_gr - kareem_team_gr
+
 hayes_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Elvin Hayes*"),]
 hayes_peak <- hayes_peak[which.max(hayes_peak$GR),]
 #hayes_peak
-hayes_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1977" & szn_stats_gr$Tm == "WSB"  & szn_stats_gr$Player != "Elvin Hayes*"),]
+hayes_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 1977 & szn_stats_gr$Tm == "WSB"  & szn_stats_gr$Player != "Elvin Hayes*"),]
 #hayes_teammates
-
+hayes_gr <- mean(hayes_peak$GR)
+hayes_team_gr <- mean(hayes_teammates$GR)
+hayes_adjusted_gr <- hayes_gr - hayes_team_gr
 
 magic_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Magic Johnson*"),]
 magic_peak <- magic_peak[which.max(magic_peak$GR),]
 #magic_peak
-magic_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1987" & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Magic Johnson*"),]
+magic_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 1987 & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Magic Johnson*"),]
 #magic_teammates
+magic_gr <- mean(magic_peak$GR)
+magic_team_gr <- mean(magic_teammates$GR)
+magic_adjusted_gr <- magic_gr - magic_team_gr
 bird_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Larry Bird*"),]
 bird_peak <- bird_peak[which.max(bird_peak$GR),]
 #bird_peak
-bird_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1988" & szn_stats_gr$Tm == "BOS"  & szn_stats_gr$Player != "Larry Bird*"),]
+bird_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 1988 & szn_stats_gr$Tm == "BOS"  & szn_stats_gr$Player != "Larry Bird*"),]
 #bird_teammates
-
+bird_gr <- mean(bird_peak$GR)
+bird_team_gr <- mean(bird_teammates$GR)
+bird_adjusted_gr <- bird_gr - bird_team_gr
 
 duncan_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Tim Duncan"),]
 duncan_peak <- duncan_peak[which.max(duncan_peak$GR),]
 #duncan_peak
-duncan_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "2002" & szn_stats_gr$Tm == "SAS"  & szn_stats_gr$Player != "Tim Duncan"),]
+duncan_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 2002 & szn_stats_gr$Tm == "SAS"  & szn_stats_gr$Player != "Tim Duncan"),]
 #duncan_teammates
+duncan_gr <- mean(duncan_peak$GR)
+duncan_team_gr <- mean(duncan_teammates$GR)
+duncan_adjusted_gr <- duncan_gr - duncan_team_gr
+
 dirk_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Dirk Nowitzki"),]
 dirk_peak <- dirk_peak[which.max(dirk_peak$GR),]
 #dirk_peak
-dirk_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "2006" & szn_stats_gr$Tm == "DAL"  & szn_stats_gr$Player != "Dirk Nowitzki"),]
+dirk_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 2006 & szn_stats_gr$Tm == "DAL"  & szn_stats_gr$Player != "Dirk Nowitzki"),]
 #dirk_teammates
-
-
+dirk_gr <- mean(dirk_peak$GR)
+dirk_team_gr <- mean(dirk_teammates$GR)
+dirk_adjusted_gr <- dirk_gr - dirk_team_gr
 
 shaq_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Shaquille O'Neal*"),]
 shaq_peak <- shaq_peak[which.max(shaq_peak$GR),]
 #shaq_peak
-shaq_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "2000" & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Shaquille O'Neal*"),]
+shaq_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 2000 & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Shaquille O'Neal*"),]
 #shaq_teammates
+shaq_gr <- mean(shaq_peak$GR)
+shaq_team_gr <- mean(shaq_teammates$GR)
+shaq_adjusted_gr <- shaq_gr - shaq_team_gr
+
 hakeem_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Hakeem Olajuwon*"),]
 hakeem_peak <- hakeem_peak[which.max(hakeem_peak$GR),]
 #hakeem_peak
-hakeem_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1993" & szn_stats_gr$Tm == "HOU"  & szn_stats_gr$Player != "Hakeem Olajuwon*"),]
+hakeem_teammates <-szn_stats_gr[which(szn_stats_gr$Year == 1993 & szn_stats_gr$Tm == "HOU"  & szn_stats_gr$Player != "Hakeem Olajuwon*"),]
 #hakeem_teammates
+hakeem_gr <- mean(hakeem_peak$GR)
+hakeem_team_gr <- mean(hakeem_teammates$GR)
+hakeem_adjusted_gr <- hakeem_gr - hakeem_team_gr
+
+player_enum <- c(1:16)
+playeragrs <-  c(kobe_adjusted_gr, tmac_adjusted_gr, lebron_adjusted_gr, durant_adjusted_gr, jordan_adjusted_gr, barkley_adjusted_gr, chamberlain_adjusted_gr, russell_adjusted_gr, kareem_adjusted_gr, hayes_adjusted_gr, magic_adjusted_gr, bird_adjusted_gr, duncan_adjusted_gr, dirk_adjusted_gr, shaq_adjusted_gr, hakeem_adjusted_gr)
+player_names <- c("kobe", "tmac", "lebron", "durant", "jordan", "barkley", "wilt", "russell", "kareem", "hayes", "magic", "bird", "duncan", "dirk", "shaq", "hakeem")
+plot(playeragrs~player_enum, pch = 19, col = "red", ylab= "Adjusted GR", xlab="", main="Adjusted GR (Higher is better)" )
+text(playeragrs~player_enum, labels=player_names, cex=0.9, font=2)
 ```
+**
 
 
+```{r}
+#Potential GOATs ordered in descending GOAT Rating
+
+goatorder <- szn_statsnb %>% arrange(desc(aGR))
+goatorder <- goatorder[, c(1, 10)]
+goatorder
+```
