@@ -609,5 +609,8 @@ plot(TukeyHSD(aov1))
 #Fix axes
 plot(TukeyHSD(aov1), las = 1)
 
+mod3 <- lm(aGR ~ era, data = alleras_nb)
+
+myResPlots(mod3, label = "Player GOAT Rating by Era")
 ```
 
