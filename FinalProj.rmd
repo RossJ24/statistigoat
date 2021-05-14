@@ -115,7 +115,12 @@ get_player_avgs <- function(eradf){
   ret <- eradf %>% 
   group_by(Player) %>% 
 
+<<<<<<< HEAD
+  summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T), aPER = mean(PER, na.rm = T), aGR = mean(GR, na.rm = T))
+
+=======
   summarise(aPPG = mean(PPG, na.rm = T), aAPG = mean(APG, na.rm = T), aORPG = mean(ORPG, na.rm = T), aDRPG = mean(DRPG, na.rm = T), aBPG = mean(BPG, na.rm = T), aTPG = mean(TPG, na.rm = T), aTSP = mean(TS., na.rm = T), aPER = mean(PER, na.rm = T), aGR = mean(GR, na.rm = T), aUSG = mean(USG., na.rm = T), aOWS = mean(OWS, na.rm = T), aDWS = mean(DWS, na.rm = T), aVORP = mean(VORP, na.rm = T))
+>>>>>>> d9051c81ab152beac835535210c4873ee1c042c2
   return(ret)
 }
 
@@ -613,4 +618,128 @@ mod3 <- lm(aGR ~ era, data = alleras_nb)
 
 myResPlots(mod3, label = "Player GOAT Rating by Era")
 ```
+```{r}
+kobe_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Kobe Bryant"),]
+kobe_peak <- kobe_peak[which.max(kobe_peak$GR),]
+#kobe_peak
+kobe_teammates <- szn_stats_gr[which(szn_stats_gr$Year == "2006" & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Kobe Bryant"),]
+#kobe_teammates
+tmac_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Tracy McGrady"),]
+tmac_peak <- tmac_peak[which.max(tmac_peak$GR),]
+#tmac_peak
+tmac_teammates <- szn_stats_gr[which(szn_stats_gr$Year == "2003" & szn_stats_gr$Tm == "ORL"  & szn_stats_gr$Player != "Tracy McGrady"),]
+#tmac_teammates
+
+
+lebron_peak <- szn_stats_gr[which(szn_stats_gr$Player == "LeBron James"),]
+lebron_peak <- lebron_peak[which.max(lebron_peak$GR),]
+#lebron_peak
+lebron_teammates <- szn_stats_gr[which(szn_stats_gr$Year == "2010" & szn_stats_gr$Tm == "CLE"  & szn_stats_gr$Player != "LeBron James"),]
+#lebron_teammates
+durant_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Kevin Durant"),]
+durant_peak <- durant_peak[which.max(durant_peak$GR),]
+#durant_peak
+durant_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "2014" & szn_stats_gr$Tm == "OKC"  & szn_stats_gr$Player != "Kevin Durant"),]
+#durant_teammates
+
+
+jordan_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Michael Jordan*"),]
+jordan_peak <- jordan_peak[which.max(jordan_peak$GR),]
+#jordan_peak
+jordan_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1988" & szn_stats_gr$Tm == "CHI"  & szn_stats_gr$Player != "Michael Jordan*"),]
+#jordan_teammates
+barkley_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Charles Barkley*"),]
+barkley_peak <- barkley_peak[which.max(barkley_peak$GR),]
+#barkley_peak
+barkley_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1988" & szn_stats_gr$Tm == "PHI"  & szn_stats_gr$Player != "Charles Barkley*"),]
+#barkley_teammates
+
+
+chamberlain_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Wilt Chamberlain*"),]
+chamberlain_peak <- chamberlain_peak[which.max(chamberlain_peak$GR),]
+#chamberlain_peak
+chamberlain_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1962" & szn_stats_gr$Tm == "PHW"  & szn_stats_gr$Player != "Wilt Chamberlain*"),]
+#chamberlain_teammates
+russell_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Bill Russell*"),]
+russell_peak <- russell_peak[which.max(russell_peak$GR),]
+#russell_peak
+russell_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1962" & szn_stats_gr$Tm == "BOS"  & szn_stats_gr$Player != "Bill Russell*"),]
+#russell_teammates
+
+
+kareem_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Kareem Abdul-Jabbar*"),]
+kareem_peak <- kareem_peak[which.max(kareem_peak$GR),]
+#kareem_peak
+kareem_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1976" & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Kareem Abdul-Jabbar*"),]
+#kareem_teammates
+hayes_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Elvin Hayes*"),]
+hayes_peak <- hayes_peak[which.max(hayes_peak$GR),]
+#hayes_peak
+hayes_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1977" & szn_stats_gr$Tm == "WSB"  & szn_stats_gr$Player != "Elvin Hayes*"),]
+#hayes_teammates
+
+
+magic_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Magic Johnson*"),]
+magic_peak <- magic_peak[which.max(magic_peak$GR),]
+#magic_peak
+magic_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1987" & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Magic Johnson*"),]
+#magic_teammates
+bird_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Larry Bird*"),]
+bird_peak <- bird_peak[which.max(bird_peak$GR),]
+#bird_peak
+bird_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1988" & szn_stats_gr$Tm == "BOS"  & szn_stats_gr$Player != "Larry Bird*"),]
+#bird_teammates
+
+
+duncan_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Tim Duncan"),]
+duncan_peak <- duncan_peak[which.max(duncan_peak$GR),]
+#duncan_peak
+duncan_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "2002" & szn_stats_gr$Tm == "SAS"  & szn_stats_gr$Player != "Tim Duncan"),]
+#duncan_teammates
+dirk_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Dirk Nowitzki"),]
+dirk_peak <- dirk_peak[which.max(dirk_peak$GR),]
+#dirk_peak
+dirk_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "2006" & szn_stats_gr$Tm == "DAL"  & szn_stats_gr$Player != "Dirk Nowitzki"),]
+#dirk_teammates
+
+
+
+shaq_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Shaquille O'Neal*"),]
+shaq_peak <- shaq_peak[which.max(shaq_peak$GR),]
+#shaq_peak
+shaq_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "2000" & szn_stats_gr$Tm == "LAL"  & szn_stats_gr$Player != "Shaquille O'Neal*"),]
+#shaq_teammates
+hakeem_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Hakeem Olajuwon*"),]
+hakeem_peak <- hakeem_peak[which.max(hakeem_peak$GR),]
+#hakeem_peak
+hakeem_teammates <-szn_stats_gr[which(szn_stats_gr$Year == "1993" & szn_stats_gr$Tm == "HOU"  & szn_stats_gr$Player != "Hakeem Olajuwon*"),]
+#hakeem_teammates
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
 
