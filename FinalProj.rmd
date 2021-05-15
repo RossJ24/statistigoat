@@ -16,6 +16,7 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r}
 #Load lbraries
 library(dplyr)
+library(leaps)
 source("http://www.reuningscherer.net/s&ds230/Rfuncs/regJDRS.txt")
 
 # Load datasets
@@ -91,7 +92,7 @@ szn_statspavgs <- szn_statspavgs[-1, ]
 ```{r}
 
 # Make boxplots of the variables we are considering to show why we need to adjust
-#Points Boxplot
+
 
 boxplot(era1pavgs$aGR, era2pavgs$aGR, era3pavgs$aGR, era4pavgs$aGR, era5pavgs$aGR, era6pavgs$aGR, main ="GOAT Rating by Era", names = c("1950-1965", "1966-1980", "1981-1990", "1991-2000", "2001-2010", "2011-2017"), las = 2)
 ```
@@ -166,10 +167,6 @@ summary(aov1)
 
 TukeyHSD(aov1)
 
-# Gives SIMULTANEOUS 95% CI's for the 10 differences in means.
-plot(TukeyHSD(aov1))
-
-#Fix axes
 plot(TukeyHSD(aov1), las = 1)
 
 mod3 <- lm(aGR ~ era, data = alleras_nb)
@@ -182,9 +179,6 @@ myResPlots(mod3, label = "Player GOAT Rating by Era")
 ```{r}
 #scatterplots plotting each variable versus GR
 
-szn_statsnb$aVORP[szn_statsnb$aVORP == 0] <- NA
-szn_statsnb$aUSG[szn_statsnb$aUSG == 0] <- NA
-set.seed(230)
 myCor <- function(x, y, w, z){
   #make the scatterplot
   plot(x, y, pch = 19, col = "red", xlab = w, ylab = z)
@@ -202,7 +196,7 @@ myCor(szn_statsnb$aUSG, szn_statsnb$aGR, "USG", "GR")
 
 ```{r}
 #bootstrapping the correlations between each advanced stat variable and GOAT Rating(GR)
-
+set.seed(230)
 N <- nrow(szn_statsnb)
 
 n_samp <- 10000
@@ -285,7 +279,7 @@ for(i in 1:10000){
 }
 
 #Add something to make the abline show
-hist(avgdiff, col= "blue", xlim = c(-.7, .7), main="Permuted Sample Differences")
+hist(avgdiff, col= "blue", xlim = c(-.7, .7), main="Permuted Sample PER Differences")
 abline(v= actualdiff, col = "green", lwd = 3)
 text(actualdiff,0, paste("Actual Difference in means =", round(actualdiff, 3)), srt = 90, adj = 0)
 actualdiff
@@ -307,93 +301,84 @@ for(i in 1:10000){
 }
 
 #Add something to make the abline show
-hist(avgdiff, col= "blue", xlim = c(-7, 7), main="Permuted Sample Differences")
+hist(avgdiff, col= "blue", xlim = c(-7, 7), main="Permuted Sample TS% Differences")
 abline(v= actualdiff, col = "green", lwd = 3)
 text(actualdiff,0, paste("Actual Differences in Means =", round(actualdiff, 3)), srt = 90, adj = 0)
 actualdiff
 mean(abs(avgdiff) >= abs(actualdiff))
 ```
 
-```{r}
-#multiple regression
+## Building a Model to Predict GOAT Rating
+One of our objectives was to investigate whether advanced stats like PER, VORP, OWS, DWS, and USG are accurate predictor variables of GOAT Rating. A lot of people find these advanced stats controversial, especially when used in the GOAT debate. Our goal is to see how reliable of predictors are advanced stats of GOAT Rating, as an attempt to answer this question.
 
-#get version of szn_statsnb that only has complete cases. reorder so that GR is first column
+```{r}
+#This makes a version of szn_stats with only aGR, aOWS, aDWS, aVORP, and aPER as columns. 
 szn_statsnb2 <- szn_statsnb[complete.cases(szn_statsnb), ]
 szn_statsnb2 <- szn_statsnb2[,-1]
 szn_statsnb2 <- szn_statsnb2[, c(9, 8, 10, 11, 12, 13)]
+```
 
+Checking the normality of our response variable, since that is important when fitting a linear model.
+```{r}
+qqPlot(szn_statsnb2$aGR, ylab = "GOAT Rating", main = "Normal Quantile Plot of GR")
+
+```
+The Normal Quantile Plot reveals that GOAT Rating is a little skewed to the right, but overall, it is pretty linear and has only a couple outliers, so it would appropriate to fit a linear model with this response variable.
+
+We will also check to see if there is any multicollinearity between the variables we are considering, since that would affect the validity of our model if it ends up using multiple variables.
+```{r}
 pairsJDRS(szn_statsnb2)
-#some evidence of multicollinearity between the variables present. VORP is correlated to DWS, OWS, and PER. PER is correlated to all other variables. Perhaps we should delete VORP and PER?
 ```
+There is some multicollinearity present between our variables, especially with aVORP and aPER. We will have to consider this when picking the final model. 
 
-
+We will use the regsubsets function to determine what combination of our advanced stats variables make the best model for predicting GOAT Rating.
 ```{r}
-#make a model using all predictors
-
-lm1 <- lm(aGR ~ aPER + aVORP + aOWS + aDWS + aUSG, data=szn_statsnb2)
-summary(lm1)
-myResPlots2(lm1, label = "Model with All Predictors")
-```
-
-```{r}
-library(leaps)
-#use best subsets to find best models
-
+#This functions does a best subsets analysis to determind the variables that make the best model for each number of possible variables.
 mod1 <- regsubsets(aGR ~ ., data = szn_statsnb2, nvmax = 5)
 
 mod1sum <- summary(mod1)
+```
+There are many ways to pick a 'best model' but we will try BIC as a measurement of which model is the best one since it exacts a penalty for fitting too many variables unnecessarily. Then we will pick the model deemed the best.
 
-
+For the best model based on BIC, the best one is the model that uses aPER, aUSG.
+```{r}
 #find what number of variables give the best model according to BIC
 which.min(mod1sum$bic)
 
-#Which variables are in model 2
+#Which variable is in model 4
 names(szn_statsnb2)[mod1sum$which[which.min(mod1sum$bic), ]][-1]
-
-#Fit this model and show results
-temp <- szn_statsnb2[,mod1sum$which[which.min(mod1sum$bic), ]]
-myResPlots2(lm(log(temp$aGR) ~ ., data = temp))
-summary(lm(aGR ~ ., data = temp))
 ```
-
+Next, we will get the summary of this model.
 
 ```{r}
-#try to fit a model without VORP and PER to see if that helps get rid of multicollinearity
-
-#get version of szn_statsnb that only has complete cases. reorder so that GR is first column
+temp <- szn_statsnb2[,mod1sum$which[which.min(mod1sum$bic), ]]
+summary(lm(aGR ~ ., data = temp))
+```
+Although this linear model looks like a great fit with a high R-squared value, we did see signs of multicollinearity with the aPER and aVORP variables earlier. So, we will try another model, this time without those two variables.
+```{r}
 szn_statsnb3 <- szn_statsnb[complete.cases(szn_statsnb), ]
 szn_statsnb3 <- szn_statsnb3[,-1]
 szn_statsnb3 <- szn_statsnb3[, c(9, 10, 11, 12)]
 
-pairsJDRS(szn_statsnb3)
-#less evidence of multicollinearity now
-
 ```
 
+There is less evidence of multicollinearity between predictors now. 
+```{r}
+pairsJDRS(szn_statsnb3)
+```
+
+Now we will fit another model with just the remaining three predictors and compare its adjusted R-squared value to the previous model's.
 ```{r}
 lm2 <- lm(aGR ~ aOWS + aDWS + aUSG, data=szn_statsnb3)
 summary(lm2)
-
-myResPlots2(lm2)
 ```
+The adjusted R-squared value of the second model is only a little lower than the first model's(around 0.03 less) and it does not contain any multicollinearity so we will pick this model as our final one, provided its residuals look reasonable. As for the model itself, all three predictor variables have positive coefficients that are significant with p-values much lower than 0.05. It appears that a player's GOAT Rating is predicted to increase as their OWS, DWS, and USG increases. The model has an adjusted R-sq of 0.84, meaning that 84% of the variability of GOAT Rating can be explained by the model. 
 
 ```{r}
-mod2 <- regsubsets(aGR ~ ., data = szn_statsnb3, nvmax = 3)
-
-mod2sum <- summary(mod2)
-summary(mod2)
-which.min(mod2sum$bic)
-
-#since all variables are in this, it is the same as the original model
-names(szn_statsnb3)[mod2sum$which[which.min(mod2sum$bic), ]][-1]
-
+myResPlots2(lm2, label = "GOAT Rating Residuals")
 ```
+The residuals are generally normally distributed and there is no evidence of heteroskedasticity.
 
-```{r}
-#final model 
-finalmod <- summary(lm(aGR ~ ., data = temp))
-finalmod
-```
 
 **
 
