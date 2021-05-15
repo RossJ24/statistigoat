@@ -567,7 +567,6 @@ td_sd <- (era_5_td_gr - mean(era5$GR))/sd(era5$GR)
 kobe_sd <- (era_5_kobe_gr - mean(era5$GR))/sd(era5$GR)
 
 lbj_sd <- (era_6_lbj_gr - mean(era6$GR))/sd(era6$GR)
-<<<<<<< HEAD
 
 all_sd <- rbind(russel_sd, wilt_sd, kareem_sd, magic_sd, bird_sd, mj_sd, shaq_sd, td_sd, kobe_sd, lbj_sd)
 
@@ -590,8 +589,6 @@ firstera$Era <- 1
 
 secondera <- era2
 secondera$Era <- 2
-=======
->>>>>>> d71cbceb355210afc2eda62147a0245a41dcd208
 
 player_enum <- c(1:10)
 playersds <-  c(russel_sd, wilt_sd, kareem_sd, magic_sd, bird_sd, mj_sd, shaq_sd, td_sd, kobe_sd, lbj_sd)
