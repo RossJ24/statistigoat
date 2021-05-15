@@ -552,12 +552,15 @@ lbj_sd <- (era_6_lbj_gr - mean(era6$GR))/sd(era6$GR)
 all_sd <- rbind(russel_sd, wilt_sd, kareem_sd, magic_sd, bird_sd, mj_sd, shaq_sd, td_sd, kobe_sd, lbj_sd)
 
 
-plot(all_sd, main = "Standard Deviations of Goat Rating", xlab = "Player Name", ylab = "Goat Rating Standard Deviation", col = "red")
-text("russell", "wilt", "kareem", "magic", "bird", "mj", "shaq", "duncan", "kobe", "LeBron")
+plot(all_sd, main = "Standard Deviations of Goat Rating", xlab = "Player Name", ylab = "Goat Rating Standard Deviation", col = "white")
+text(all_sd, labels = c("Russell", "Wilt", "Kareem", "Magic", "Bird", "MJ", "Shaq", "Duncan", "Kobe", "LeBron"), cex = .7)
+
 
 goat_compared_to_rest <- rbind(russel_compared_to_rest, wilt_compared_to_rest, kareem_compared_to_rest, magic_compared_to_rest, bird_compared_to_rest, mj_compared_to_rest, shaq_compared_to_rest, td_compared_to_rest, kobe_compared_to_rest, lbj_compared_to_rest)
 
-plot(goat_compared_to_rest, main = "Player's average GR compared to era's average GR", xlab = "Player's Name", ylab = "GOAT divided by era's average Goat Rating")
+plot(goat_compared_to_rest, main = "Player's average GR compared to era's average GR", xlab = "Player's Name", ylab = "GOAT's mean GR divided by era's average GR", col = "white")
+text(goat_compared_to_rest, labels = c("Russell", "Wilt", "Kareem", "Magic", "Bird", "MJ", "Shaq", "Duncan", "Kobe", "LeBron"), cex = .7)
+
 ```
 
 ```{r}
