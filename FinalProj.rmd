@@ -1,25 +1,22 @@
 ---
 title: "StatistiGoat"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=6, fig.height=4)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-## Introduction and Motivation
+#### Introduction and Motivation
 For decades, NBA fans across the world have hotly debated who is the greatest player to ever pick up a basketball. Some believe LeBron James is the GOAT (the Greatest of All Time). Other fans have reasons for why it’s Michael Jordan. There are other explanations for why the logical choice has got to be Kobe, Shaq, Magic or whomever else. How should you go about comparing players across eras? Bill Russel and Wilt Chamberlain both dominated but played in an era without a lot of great competition. Should this weaken their case as being the GOAT? Are advanced stats like Player Efficiency Rating (PER), Value Over Replacement Player (VORP), Usage Rate, and Win Shares good indicators of who is the GOAT? Which of the two historic franchises, the Lakers and Celtics each having 17 titles, is the best? Our group, being basketball fans, has decided to end this long-suffering debate with the power of statistics. Throughout this project we looked to settle this debate, once and for all.
 
-## Data Cleaning and Adding Relevant Variables
+#### Data Cleaning and Adding Relevant Variables
 
-*Ross write up what u did to clean the data here(what variables we added and why(meaning we have to explain why we wrote the GR formula the way we did. doesn't have to be long or complicated), and how you cleaned the data frame). also say what time span the data covers.*
 We got our data from a kaggle dataset [here](https://www.kaggle.com/drgilermo/nba-players-stats?select=Seasons_Stats.csv) and downloaded it. The data we used was the basketball game statistics of all players from seasons 1950 -> 2017. This data was not game specific, but more of a total over the course of a season. This led to us having to divide each cumulative statistic by the number that particular player played that season resulting per game statistics. We chose to write a formula to represent a particular rating for a player's Goat likelihood. We called this statistic their Goat Rating (GR). We took into account statistics that have an obvious impact on the performance of a team, such as points per game (PPG), offensive rebounds per game (ORPG), defensive rebounds (DRPG), assists per game (APG), blocks per game (BPG), turnovers per game (TPG), true shooting percentage (TS.), and player efficiency rating (PER). *formula: GR = 2(PPG) + ⅘(DRPG) + ORPG + 1.5(APG) + PER - 1.5(TO) + Blocks + 10(TS%)*
+
 ```{r, echo=FALSE}
 #Load relevant libraries
 library(dplyr)
@@ -46,6 +43,7 @@ szn_stats$GR <- szn_stats_gr$GR
 ```
 
 We split up the eras using larger periods (15 years) in the first two eras when the league was smaller, and decreased it to 10 for all eras up until 2010 when we used the remaining years of the dataset until 2017 to form our final era.
+
 ```{r}
 # Extract era statistics here
 # Got rid of people in ERA 1 who didn't have a player efficiency rating.
@@ -64,7 +62,8 @@ era6 <- szn_stats[which(szn_stats$Year > 2010),]
 
 ```
 
-The dataset we had was a list of every individual season in the NBA's history. We wanted to work with player career average stats, so we wrote a function to get the average stats for each unique player in the NBA. Hence the 'a' in front of every column name to indicate this (like aPER instead of PER). The variables are still measuring the same quantities however. 
+The dataset we had was a list of every individual season in the NBA's history. We wanted to work with player career average stats, so we wrote a function to get the average stats for each unique player in the NBA. Hence the 'a' in front of every column name to indicate this (like aPER instead of PER). The variables are still measuring the same quantities however.
+
 ```{r}
 get_player_avgs <- function(eradf){
   ret <- eradf %>% 
@@ -85,7 +84,7 @@ szn_statspavgs <- get_player_avgs(szn_stats)
 szn_statspavgs <- szn_statspavgs[-1, ]
 ```
 
-## List of Variables Used with Explanations
+#### List of Variables Used with Explanations
 *All variables are continuous, we have no categorical variables*
 PPG- Points Per Game
 ORPG- Offensive Rebounds Per Game(how many times a player grabs  the loose ball directly after a shot by his team)
@@ -103,12 +102,13 @@ GR- GOAT Rating (a stat we generated using basic stats such as TSP, ORPG, PPG, D
 
 For more information on any of these variables, go to this [link](https://www.basketball-reference.com/about/glossary.html)
 
-##Part 1: Does Era Matter for GOAT Rating?
+#### Part 1: Does Era Matter for GOAT Rating?
 
 A critical point of major disagreement during GOAT debates is whether superstars in older eras played against easier competitions. Some people say older eras had better defense, so it was harder to play back then. Others counter with the superior offense of more recent eras. We can use boxplots and One-way ANOVA to answer this question.
+
 ```{r}
 # Make boxplots of GR for each era
-boxplot(era1pavgs$aGR, era2pavgs$aGR, era3pavgs$aGR, era4pavgs$aGR, era5pavgs$aGR, era6pavgs$aGR, main ="GOAT Rating by Era", names = c("1950-1965", "1966-1980", "1981-1990", "1991-2000", "2001-2010", "2011-2017"), las = 2, col="yellow")
+boxplot(era1pavgs$aGR, era2pavgs$aGR, era3pavgs$aGR, era4pavgs$aGR, era5pavgs$aGR, era6pavgs$aGR, main ="GOAT Rating by Era", names = c("1950-1965", "1966-1980", "1981-1990", "1991-2000", "2001-2010", "2011-2017"), las = 2, col="yellow", ylab="Goat Rating")
 ```
 
 The boxplot doesn’t seem to show any differences between GOAT Ratings between eras, as the medians look to be the same. However, this is probably not representative of the top players we are trying to analyze since they all register as outliers in this plot.  Since our purpose involves analyzing the best players of each era, it would be best to consider only the players that are at the top of their era in terms of PPG.
@@ -132,10 +132,11 @@ szn_statsnb <- get_rid_of_bums_avg(szn_statspavgs)
 
 ```{r}
 #to put to rest: do different eras have different levels of competition? pair with ANOVA to answer this 
-boxplot(era1nb$aGR, era2nb$aGR, era3nb$aGR, era4nb$aGR, era5nb$aGR, era6nb$aGR, main ="GOAT Rating by Era (Without Bums)", names = c("1950-1965", "1966-1980", "1981-1990", "1991-2000", "2001-2010", "2011-2017"), las = 2, col="green")
+boxplot(era1nb$aGR, era2nb$aGR, era3nb$aGR, era4nb$aGR, era5nb$aGR, era6nb$aGR, main ="GOAT Rating by Era (Without Bums)", names = c("1950-1965", "1966-1980", "1981-1990", "1991-2000", "2001-2010", "2011-2017"), las = 2, col="green", ylab="Goat Rating")
 
 
 ```
+
 After taking out the bums, the boxplot clearly shows differences in GOAT rating by era. However,are these differences significant? We will use One-wat ANOVA to find out.
 
 ```{r}
@@ -184,10 +185,12 @@ mod3 <- lm(aGR ~ era, data = alleras_nb)
 
 myResPlots(mod3, label = "Player GOAT Rating by Era")
 ```
+
 The GR is not statistically significantly different between different eras as the p-value is not smaller than an alpha of 0.05. For the Tukey test pairs, all combinations of eras intercept 0 meaning, there are no statistically significant differences between eras.  In the Residual Plot of Fits vs. Residuals, there is no evidence of heteroskedasticity. The normal quantile plot indicates that there is a slight right skew in the residuals. This means that according to GOAT Rating, superstars played against similar levels of competition across all eras.
 
-## Part 2: Analyzing the Correlations between GOAT Rating and Advanced Stats
+#### Part 2: Analyzing the Correlations between GOAT Rating and Advanced Stats
 Another part of the GOAT debate people often disagree on is whether the advanced stats sports analysts have created today are actually valid to use when making an argument for a player's potential GOATship. To answer that question, we will find the correlations between GR and VORP, PER, USG, OWS, and DWS both with theoretical methods and bootstrapping.
+
 ```{r}
 #scatterplots plotting each advanced stat variable versus GR
 
@@ -204,6 +207,8 @@ myCor(szn_statsnb$aDWS, szn_statsnb$aGR, "DWS", "GR")
 myCor(szn_statsnb$aVORP, szn_statsnb$aGR, "VORP", "GR")
 myCor(szn_statsnb$aUSG, szn_statsnb$aGR, "USG", "GR")
 ```
+
+
 All advanced statistics seem to have a positive correlation to the Goat Rating with the two with the highest correlation being PER and VORP. It makes sense that these two have the highest correlation because the Goat Rating is meant to be a very encompassing statistic of how good a player is and PER and VORP are also meant to complete similar tasks.
 
 ```{r}
@@ -272,12 +277,14 @@ abline(v = ci_rUSG, lwd = 3, col = "red")
 abline(v = cor.test(szn_statsnb$aGR, szn_statsnb$aUSG)$conf.int, lwd = 3, col = "green", lty = 2)
 legend("topleft", c("Theoretical CI","Boot CI"), lwd = 3, col = c("green","red"), lty = c(2, 1))
 ```
- The bootstrapped correlations between each advanced stat and GR generally resulted in normally distributed histograms with fat tails(on the right or left), but this was expected as even when considering the players in the top 5% of the league in PPG, there are players that are much better or much worse than others. The only ones where the theoretical and bootstrap intervals were nearly overlapping were Usage vs GR and Defensive Win Shares vs GR. All in all though, the bootstrapped correlations do agree with the theoretical correlations since the bootstrap 95% confidence intervals encompass the theoretical intervals. The fact that these advanced stats are strongly correlated with GR supports the idea that advanced stats can be a solid line of evidence when making a GOAT argument for a player.
+
+The bootstrapped correlations between each advanced stat and GR generally resulted in normally distributed histograms with fat tails(on the right or left), but this was expected as even when considering the players in the top 5% of the league in PPG, there are players that are much better or much worse than others. The only ones where the theoretical and bootstrap intervals were nearly overlapping were Usage vs GR and Defensive Win Shares vs GR. All in all though, the bootstrapped correlations do agree with the theoretical correlations since the bootstrap 95% confidence intervals encompass the theoretical intervals. The fact that these advanced stats are strongly correlated with GR supports the idea that advanced stats can be a solid line of evidence when making a GOAT argument for a player.
 
 
-##Part 3: Using Permutation Tests to Compare Player Efficiency Across Generations
+#### Part 3: Using Permutation Tests to Compare Player Efficiency Across Generations
 
 Yet another point that comes up during basketball GOAT debates is whether players have become more effective at scoring over time. To answer this we will be performing permutation tests on Player Efficiency Rating(PER) and True Shooting Percentage(TSP) between players before 1980 and players after 1980.
+
 ```{r}
 #Permutation tests on TS and PER between season stats before 1980 and season stats after 1980
 set.seed(230)
@@ -299,6 +306,7 @@ text(actualdiff,0, paste("Actual Difference in means =", round(actualdiff, 3)), 
 actualdiff
 mean(abs(avgdiff) >= abs(actualdiff))
 ```
+
 The null hypothesis is that there is no difference between PER before and after 1980 while the alternative hypothesis is that this difference is greater than zero(in absolute value). The actual difference calculated is -0.4, meaning players after 1980 were more efficient. Assuming that the null hypothesis is true, there is a probability way less than 0 that we would get such a difference or greater. We are using a p = 0.05 significance level, therefore since 0 < 0.05, our results reject the null hypothesis, and support the alternative hypothesis that there is an actual difference in PER between players before and after 1980.
 
 
@@ -322,11 +330,12 @@ text(actualdiff,0, paste("Actual Differences in Means =", round(actualdiff, 3)),
 actualdiff
 mean(abs(avgdiff) >= abs(actualdiff))
 ```
+
 The null hypothesis is that there is no difference between TSP before and after 1980 while the alternative hypothesis is that this difference is greater than zero(in absolute value). The actual difference calculated is -4.4%, meaning players after 1980 shot better. Assuming that the null hypothesis is true, there is a probability way less than 0 that we would get such a difference or greater. We are using a p = 0.05 significance level, therefore since 0 < 0.05, our results reject the null hypothesis, and support the alternative hypothesis that there is an actual difference in true shooting percentage for players before and after 1980.
 
 
 
-## Part 4: Building a Model to Predict GOAT Rating
+#### Part 4: Building a Model to Predict GOAT Rating
 One of our objectives was to investigate whether advanced stats like PER, VORP, OWS, DWS, and USG are accurate predictor variables of GOAT Rating. A lot of people find these advanced stats controversial, especially when used in the GOAT debate. We used correlations to answer this question before, but now we will use multiple regression. Our goal is to see how reliable of predictors are advanced stats of GOAT Rating, as an attempt to answer this question.
 
 ```{r}
@@ -340,24 +349,30 @@ Checking the normality of our response variable, since that is important when fi
 ```{r}
 qqPlot(szn_statsnb2$aGR, ylab = "GOAT Rating", main = "Normal Quantile Plot of GR")
 ```
+
 The Normal Quantile Plot reveals that GOAT Rating is a little skewed to the right, but overall, it is pretty linear and has only a couple outliers, so it would appropriate to fit a linear model with this response variable.
 
 We will also check to see if there is any multicollinearity between the variables we are considering, since that would affect the validity of our model if it ends up using multiple variables.
+
 ```{r}
 pairsJDRS(szn_statsnb2)
 ```
+
 There is some multicollinearity present between our variables, especially with aVORP and aPER. We will have to consider this when picking the final model. 
 
 We will use the regsubsets function to determine what combination of our advanced stats variables make the best model for predicting GOAT Rating.
+
 ```{r}
 #This functions does a best subsets analysis to determind the variables that make the best model for each number of possible variables.
 mod1 <- regsubsets(aGR ~ ., data = szn_statsnb2, nvmax = 5)
 
 mod1sum <- summary(mod1)
 ```
+
 There are many ways to pick a 'best model' but we will try BIC as a measurement of which model is the best one since it exacts a penalty for fitting too many variables unnecessarily. Then we will pick the model deemed the best.
 
 For the best model based on BIC, the best one is the model that uses aPER, aUSG.
+
 ```{r}
 #find what number of variables give the best model according to BIC
 which.min(mod1sum$bic)
@@ -365,13 +380,16 @@ which.min(mod1sum$bic)
 #Which variable is in model 4
 names(szn_statsnb2)[mod1sum$which[which.min(mod1sum$bic), ]][-1]
 ```
+
 Next, we will get the summary of this model.
 
 ```{r}
 temp <- szn_statsnb2[,mod1sum$which[which.min(mod1sum$bic), ]]
 summary(lm(aGR ~ ., data = temp))
 ```
+
 Although this linear model looks like a great fit with a high R-squared value, we did see signs of multicollinearity with the aPER and aVORP variables earlier. So, we will try another model, this time without those two variables.
+
 ```{r}
 szn_statsnb3 <- szn_statsnb[complete.cases(szn_statsnb), ]
 szn_statsnb3 <- szn_statsnb3[,-1]
@@ -379,12 +397,14 @@ szn_statsnb3 <- szn_statsnb3[, c(9, 10, 11, 12)]
 
 ```
 
-There is less evidence of multicollinearity between predictors now. 
+There is less evidence of multicollinearity between predictors now.
+
 ```{r}
 pairsJDRS(szn_statsnb3)
 ```
 
 Now we will fit another model with just the remaining three predictors and compare its adjusted R-squared value to the previous model's.
+
 ```{r}
 lm2 <- lm(aGR ~ aOWS + aDWS + aUSG, data=szn_statsnb3)
 summary(lm2)
@@ -393,11 +413,13 @@ summary(lm2)
 ```{r}
 myResPlots2(lm2, label = "GOAT Rating Residuals")
 ```
+
 The adjusted R-squared value of the second model is only a little lower than the first model's(around 0.03 less) and it does not contain any multicollinearity so we will pick this model as our final one, provided its residuals look reasonable. As for the model itself, all three predictor variables have positive coefficients that are significant with p-values much lower than 0.05. It appears that a player's GOAT Rating is predicted to increase as their OWS, DWS, and USG increases. The model has an adjusted R-sq of 0.84, meaning that 84% of the variability of GOAT Rating can be explained by the model. The residuals are generally normally distributed and there is no evidence of heteroskedasticity.
 
 
-##Part 5: Using a T-test to Determine the Greatest Dynasty
+#### Part 5: Using a T-test to Determine the Greatest Dynasty
 Fans also love to debate which franchise is the GOAT. The only two viable options out of 30 teams are the LA Lakers and the Boston Celtics since they have won the most championships(17 apiece). We will use our GR variable to conduct a t-test to see whether one franchise is really better than the other.
+
 ```{r}
 
 #make a new dataset that only has players from the Lakers or the Celtics and creata a new column to denote which player is from what team.
@@ -421,11 +443,12 @@ test1$p.value
 
 #fail to reject the null that the difference in mean GRs of BOS and LAL is zero with a alpha of 0.05. conclusion: there is no significant difference therefore the teams are the same level of greatness.
 ```
+
 As the 95% confidence interval of the difference in the mean GRs between BOS players and LAL players contains zero, it appears that the franchises are equally as great. We failed to reject the null that the difference in mean GRs of BOS and LAL is zero with a alpha of 0.05. Therefore, there is no significant difference and the teams are at the same level of greatness.
 
 
 
-##Part 6 Comparing players to their competition/eras:
+#### Part 6 Comparing players to their competition/eras:
 Who dominated their era and competition more so than anyone else? Since the inception of the GOAT debate fans have argued this exact question. Using the Goat Rating that our group created we used averages and standard deviation to determine this.
 
 ```{r}
@@ -576,14 +599,16 @@ plot(goat_compared_to_rest, main = "Player's average GR compared to era's averag
 text(goat_compared_to_rest, labels = c("Russell", "Wilt", "Kareem", "Magic", "Bird", "MJ", "Shaq", "Duncan", "Kobe", "LeBron"), cex = .7)
 
 ```
+
 *Standard Deviations of Goat Rating*
 We chose to calculate how many standard deviations above their era’s average Goat Rating the 10 players in question are. For someone to be considered the greatest of all time, it is important that they dominate their eras; this metric helps to show that. From our calculations we found that LeBron James and then Michael Jordan had the two highest goat ratings compared to their eras. Of the list of 10, Bill Russell was the least dominant of his era.
 
 *Player's average GR compared to era's average GR*
 This statistic was calculated by taking one of the 10 players' average goat rating and dividing it by their era’s average goat rating. This is another statistic that can be used to see how one of the 10 players in question compare to their era. The scatterplot of this metric and the one plotting the standard deviations of the goat ratings are nearly identical. There are very few differences between the plots but one of them is that here, Michael Jordan was the most dominant compared to his era with LeBron narrowly following behind in second place. 
 
-##Part 7: Using Scatterplots to Represent Potential Goat GR vs Team GR in Peak season
+#### Part 7: Using Scatterplots to Represent Potential Goat GR vs Team GR in Peak season
 The major reason behind why we wanted to look at the gr of each of our potential goats peak season with respect to their teammates average gr that year was to see how well each of these players performed at the peaks of their career on an individual basis absent of the potential of teammate assistance. We felt this could add to our data by essentially giving us the quality of each player at their best point in their career and comparing them to each other to see who at their best point was the best of all.
+
 ```{r}
 kobe_peak <- szn_stats_gr[which(szn_stats_gr$Player == "Kobe Bryant"),]
 kobe_peak <- kobe_peak[which.max(kobe_peak$GR),]
@@ -737,18 +762,18 @@ player_names <- c("kobe", "tmac", "lebron", "durant", "jordan", "barkley", "wilt
 plot(playeragrs~player_enum, pch = 19, col = "red", ylab= "Adjusted GR", xlab="", main="Adjusted GR (Higher is better)" )
 text(playeragrs~player_enum, labels=player_names, cex=0.9, font=2)
 ```
-To obtain a representation of the peak season performances of our potential goats,we utilized our goat rating and searched for their max goat rating season. We then wanted to see how much help each of these players had, to see how much of their career success could be attributed to the help of their teammates. We utilized their most successful season as a sample for this metric, by comparing their peak goat rating season performance to the average goat rating of their teammates that year. This metric was used to strictly reflect individual quality of play rather than overall greatness inclusive of team success. When comparing each player's peak goat rating season with respect to the goat rating of their teammates, Wilt Chamberlain was considered our goat by quite a significant margin. 
 
+To obtain a representation of the peak season performances of our potential goats,we utilized our goat rating and searched for their max goat rating season. We then wanted to see how much help each of these players had, to see how much of their career success could be attributed to the help of their teammates. We utilized their most successful season as a sample for this metric, by comparing their peak goat rating season performance to the average goat rating of their teammates that year. This metric was used to strictly reflect individual quality of play rather than overall greatness inclusive of team success. When comparing each player's peak goat rating season with respect to the goat rating of their teammates, Wilt Chamberlain was considered our goat by quite a significant margin. 
 
 ```{r}
 #Potential GOATs ordered in descending GOAT Rating
 
 goatorder <- szn_statsnb %>% arrange(desc(aGR))
 goatorder <- goatorder[, c(1, 10)]
-goatorder
+head(goatorder, n=10)
 ```
 
-##Conclusion
+#### Conclusion
 
 Throughout this process, we have attempted to answer several questions that are constantly fought over by basketball fans concerning GOATness. 
 Our ANOVA test found that there is no significant difference between eras for mean GR so in that sense, competition has stayed the same. 
